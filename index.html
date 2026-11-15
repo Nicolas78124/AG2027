@@ -412,7 +412,7 @@ function renderLayer() {
       '<div class="row" style="margin:6px 20px 0;justify-content:space-between"><button type="button" data-act="closeDetail" style="min-height:44px;border:0;background:none;color:var(--gold2);font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px;padding:0">' + ic('back', 18, 'currentColor', 2) + 'Budget</button><button type="button" class="pill" data-act="openTrash">Corbeille (' + S.expTrash.length + ')</button></div><p class="small" style="margin:6px 20px 0">Glisser à gauche pour supprimer, à droite pour corriger.</p>' +
       '<section class="sec" style="gap:8px;margin-top:8px">' + (rows.length ? rows.map(function (e) {
         var who = (e.shares || []).length === NAMES.length ? 'tout le monde' : (e.shares || []).join(', ');
-        return '<div class="sw"><div class="back edit">' + ic('list', 18, 'currentColor', 2) + 'Corriger</div><div class="back del">' + ic('trash', 18, '#fff', 2) + 'Supprimer</div><div class="front" data-swipe="' + esc(e.id) + '"><div class="grow" style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600">' + esc(e.label) + '</span><span class="small">' + esc(fmtDate(e.date)) + ' · payé par ' + esc(e.payer) + '</span><span class="small">Pour : ' + esc(who) + '</span></div><span class="big" style="font-size:22px;color:var(--gold2)">' + eur(e.cents) + '</span></div></div>';
+        return '<div class="sw"><div class="back edit">' + ic('list', 18, 'currentColor', 2) + 'Corriger</div><div class="back del">' + ic('trash', 18, '#fff', 2) + 'Supprimer</div><div class="front" data-swipe="' + esc(e.id) + '"><div class="grow" style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600">' + esc(e.label) + '</span><span class="small">' + esc(fmtDate(e.date)) + ' · payé par ' + esc(e.payer) + '</span><span class="small">Pour : ' + esc(who) + '</span></div><span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:17px;font-weight:700;color:var(--gold2);white-space:nowrap;font-variant-numeric:tabular-nums">' + (e.cur === 'MUR' && e.orig ? rsFmt(e.orig) + '<span class="small" style="font-weight:500">≈ ' + eur(e.cents) + '</span>' : eur(e.cents)) + '</span></div></div>';
       }).join('') : '<div class="card" style="text-align:center;color:var(--soft);font-size:14px">Aucune dépense pour l\'instant.</div>') + '</section></div></div>';
   }
   if (S.trash) {
@@ -423,7 +423,7 @@ function renderLayer() {
       '<div class="row" style="margin:6px 20px 0"><button type="button" data-act="closeTrash" style="min-height:44px;border:0;background:none;color:var(--gold2);font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px;padding:0">' + ic('back', 18, 'currentColor', 2) + 'Retour</button></div>' +
       '<section class="sec" style="gap:8px;margin-top:8px">' + (items.length ? items.map(function (x) {
         var restoreBtn = '<button type="button" class="pill" style="border-color:var(--gold);color:var(--gold2)" data-restore="' + (showExp ? 'expenses' : 'medias') + ':' + esc(x.id) + '">Restaurer</button>';
-        if (showExp) return '<div class="tr" style="gap:12px"><div class="grow" style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600">' + esc(x.label) + ' · ' + eur(x.cents) + '</span><span class="small">' + esc(fmtDate(x.date)) + ' · payé par ' + esc(x.payer) + '</span><span class="small">Supprimée ' + esc(when(x)) + '</span></div>' + restoreBtn + '</div>';
+        if (showExp) return '<div class="tr" style="gap:12px"><div class="grow" style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600">' + esc(x.label) + ' · ' + expAmountTxt(x) + '</span><span class="small">' + esc(fmtDate(x.date)) + ' · payé par ' + esc(x.payer) + '</span><span class="small">Supprimée ' + esc(when(x)) + '</span></div>' + restoreBtn + '</div>';
         var src = mediaSrc(x);
         return '<div class="tr" style="gap:12px"><div style="width:64px;height:64px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--chip)">' + (x.kind === 'video' ? '<video src="' + src + '#t=0.1" muted playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover"></video>' : '<img src="' + src + '" alt="" style="width:100%;height:100%;object-fit:cover">') + '</div><div class="grow" style="display:flex;flex-direction:column;gap:3px"><span style="font-size:14px;font-weight:600">' + (x.kind === 'video' ? 'Vidéo' : 'Photo') + (x.by ? ' de ' + esc(x.by) : '') + '</span><span class="small">Supprimée ' + esc(when(x)) + '</span></div>' + restoreBtn + '</div>';
       }).join('') : '<div class="card" style="text-align:center;color:var(--soft);font-size:14px">La corbeille est vide.</div>') + '</section></div></div>';
@@ -631,13 +631,27 @@ function scoreCardHtml() {
     '<tr class="tot"><td>Total</td><td>' + (tp || '—') + '</td><td></td><td>' + fnum(brutT) + '</td><td>' + fnum(netT) + '</td></tr></tbody></table></div>' +
     '<p class="small" style="margin:0">Net par trou = brut − coups reçus (points dorés), répartis selon le handicap des trous. Total net = brut − handicap du jour, comme dans le règlement.</p></section></div></div>';
 }
-function newDraft() { return { amount: '', label: '', date: iso(new Date()), payer: S.me || '', shares: NAMES.slice() }; }
+function newDraft() { return { amount: '', cur: lsGet('ag27-cur') === 'MUR' ? 'MUR' : 'EUR', label: '', date: iso(new Date()), payer: S.me || '', shares: NAMES.slice() }; }
+function curRate() { return S.change && +S.change.taux ? +S.change.taux : null; }
+function draftEur(d) { var v = parseAmount(d.amount); if (d.cur !== 'MUR') return v; var r = d.rate || curRate(); return r ? Math.round(v / r) : 0; }
+function rsFmt(c) { return (c / 100).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' Rs'; }
+function expAmount(e) { return e.cur === 'MUR' && e.orig ? rsFmt(e.orig) + ' <span class="small" style="font-family:Inter,sans-serif;font-size:12px">≈ ' + eur(e.cents) + '</span>' : eur(e.cents); }
+function expAmountTxt(e) { return e.cur === 'MUR' && e.orig ? rsFmt(e.orig) + ' (≈ ' + eur(e.cents) + ')' : eur(e.cents); }
+function convLine(d) {
+  var v = parseAmount(d.amount), r = d.rate || curRate();
+  if (!v) return d.cur === 'MUR' ? 'Montant en roupies, converti en euros pour les comptes.' : 'Montant en euros.';
+  if (!r) return d.cur === 'MUR' ? 'Taux de change indisponible : saisis le montant en euros.' : '';
+  return d.cur === 'MUR' ? rsFmt(v) + ' ≈ <strong style="color:var(--gold2)">' + eur(Math.round(v / r)) + '</strong> · 1 € = ' + String(r).replace('.', ',') + ' Rs' : eur(v) + ' ≈ ' + rsFmt(Math.round(v * r));
+}
 function stepValid(st, d) {
-  return [parseAmount(d.amount) > 0, d.label.trim().length > 0, /^\d{4}-\d{2}-\d{2}$/.test(d.date), NAMES.indexOf(d.payer) >= 0, d.shares.length > 0][st - 1];
+  return [draftEur(d) > 0, d.label.trim().length > 0, /^\d{4}-\d{2}-\d{2}$/.test(d.date), NAMES.indexOf(d.payer) >= 0, d.shares.length > 0][st - 1];
 }
 function sheetHtml() {
-  var st = S.sheet.step, d = S.sheet.draft, c = parseAmount(d.amount), body = '';
-  if (st === 1) body = '<label for="f-amt" class="qt">Quel montant ?</label><div class="amt"><input id="f-amt" data-f="amount" data-autofocus type="text" inputmode="decimal" placeholder="0,00" value="' + esc(d.amount) + '" autocomplete="off" style="font-size:44px;font-family:Inter,system-ui,sans-serif;font-weight:600;font-variant-numeric:tabular-nums lining-nums"><span style="font-size:30px;font-weight:600;color:var(--gold2)">€</span></div>';
+  var st = S.sheet.step, d = S.sheet.draft, c = draftEur(d), body = '';
+  if (st === 1) body = '<label for="f-amt" class="qt">Quel montant ?</label>' +
+    '<div class="seg" role="radiogroup" aria-label="Devise" style="margin:0;grid-template-columns:repeat(2,minmax(0,1fr))"><button type="button" role="radio" aria-checked="' + (d.cur !== 'MUR') + '" data-cur="EUR" class="' + (d.cur !== 'MUR' ? 'on' : '') + '">€ Euros</button><button type="button" role="radio" aria-checked="' + (d.cur === 'MUR') + '" data-cur="MUR" class="' + (d.cur === 'MUR' ? 'on' : '') + '">Rs Roupies</button></div>' +
+    '<div class="amt"><input id="f-amt" data-f="amount" data-autofocus type="text" inputmode="decimal" placeholder="0,00" value="' + esc(d.amount) + '" autocomplete="off" style="font-size:44px;font-family:Inter,system-ui,sans-serif;font-weight:600;font-variant-numeric:tabular-nums lining-nums"><span style="font-size:30px;font-weight:600;color:var(--gold2)">' + (d.cur === 'MUR' ? 'Rs' : '€') + '</span></div>' +
+    '<span id="f-conv" style="font-size:14px;color:var(--soft);min-height:20px">' + convLine(d) + '</span>';
   if (st === 2) body = '<label for="f-lbl" class="qt">Objet de la dépense</label><input id="f-lbl" class="field" data-f="label" data-autofocus type="text" placeholder="Ex. dîner au restaurant" value="' + esc(d.label) + '" autocomplete="off"><div class="row" style="flex-wrap:wrap;gap:8px">' + ['Restaurant', 'Bar', 'Green fees', 'Taxi', 'Courses', 'Excursion'].map(function (q) { return '<button type="button" class="pill" data-quick="' + q + '">' + q + '</button>'; }).join('') + '</div>';
   if (st === 3) body = '<label for="f-dt" class="qt">Date</label><input id="f-dt" class="field" data-f="date" type="date" value="' + esc(d.date) + '"><span class="small">Aujourd\'hui par défaut, modifiable.</span>';
   if (st === 4) body = '<span class="qt">Qui a payé ?</span><div class="grid2">' + NAMES.map(function (n) { return '<button type="button" class="opt' + (d.payer === n ? ' on' : '') + '" data-payer="' + n + '" aria-pressed="' + (d.payer === n) + '">' + n + '</button>'; }).join('') + '</div>';
@@ -681,6 +695,7 @@ document.addEventListener('click', function (ev) {
     try { navigator.clipboard.writeText(txt).then(function () { toast('Copié : ' + txt); }, function () { toast('Copie impossible : appui long sur le texte.'); }); } catch (e) { toast('Copie impossible : appui long sur le texte.'); }
     return;
   }
+  if (t.hasAttribute('data-cur') && S.sheet) { S.sheet.draft.cur = t.getAttribute('data-cur'); lsSet('ag27-cur', S.sheet.draft.cur); renderLayer(); return; }
   if (t.hasAttribute('data-person')) { S.person = t.getAttribute('data-person'); renderLayer(); return; }
   if (t.hasAttribute('data-card')) { var cp = t.getAttribute('data-card').split(':'); S.card = { nom: cp[0], p: +cp[1] }; renderLayer(); return; }
   if (t.hasAttribute('data-gopen')) { var g = t.getAttribute('data-gopen'); S.golfOpen = S.golfOpen === g ? null : g; render(); return; }
@@ -736,6 +751,7 @@ document.addEventListener('input', function (ev) {
   var f = ev.target.getAttribute && ev.target.getAttribute('data-f');
   if (!f || !S.sheet) return;
   S.sheet.draft[f] = ev.target.value;
+  var cvEl = document.getElementById('f-conv'); if (cvEl) cvEl.innerHTML = convLine(S.sheet.draft);
   var b = document.getElementById('nextBtn'); if (b) b.disabled = !stepValid(S.sheet.step, S.sheet.draft);
 });
 document.addEventListener('submit', function (ev) {
@@ -777,11 +793,11 @@ function endDrag() {
   if (!e || Math.abs(d.dx) < 80) return;
   if (!S.db || S.readOnly) { toast('Lecture seule : modification impossible.'); return; }
   if (d.dx > 0) {
-    S.sheet = { step: 1, editId: e.id, createdAt: e.createdAt, draft: { amount: (e.cents / 100).toFixed(2).replace('.', ','), label: e.label, date: e.date, payer: e.payer, shares: e.shares.slice() } };
+    S.sheet = { step: 1, editId: e.id, createdAt: e.createdAt, draft: { amount: ((e.cur === 'MUR' && e.orig ? e.orig : e.cents) / 100).toFixed(2).replace('.', ','), cur: e.cur === 'MUR' && e.orig ? 'MUR' : 'EUR', rate: e.cur === 'MUR' ? e.rate : null, label: e.label, date: e.date, payer: e.payer, shares: e.shares.slice() } };
     renderLayer(); return;
   }
   {
-    S.confirm = { kind: 'expense', id: e.id, title: 'Supprimer cette dépense\u00a0?', text: '« ' + e.label + ' » · ' + eur(e.cents) + ' payé par ' + e.payer + '. Elle ira dans la corbeille, d\'où on pourra la restaurer.' };
+    S.confirm = { kind: 'expense', id: e.id, title: 'Supprimer cette dépense\u00a0?', text: '« ' + e.label + ' » · ' + expAmountTxt(e) + ' payé par ' + e.payer + '. Elle ira dans la corbeille, d\'où on pourra la restaurer.' };
     renderLayer();
   }
 }
@@ -791,7 +807,8 @@ document.addEventListener('pointercancel', endDrag);
 /* ---------- data ops ---------- */
 function saveExpense(sh) {
   var d = sh.draft, btn = document.getElementById('nextBtn'); if (btn) btn.disabled = true;
-  var body = { cents: parseAmount(d.amount), label: d.label.trim().slice(0, 120), date: d.date, payer: d.payer, shares: d.shares.slice(), createdAt: sh.editId ? (sh.createdAt || Date.now()) : Date.now(), by: S.me || '' };
+  var isRs = d.cur === 'MUR', rate = isRs ? (d.rate || curRate()) : null;
+  var body = { cents: draftEur(d), cur: isRs ? 'MUR' : 'EUR', orig: isRs ? parseAmount(d.amount) : null, rate: rate, label: d.label.trim().slice(0, 120), date: d.date, payer: d.payer, shares: d.shares.slice(), createdAt: sh.editId ? (sh.createdAt || Date.now()) : Date.now(), by: S.me || '' };
   if (sh.editId) body.editedAt = Date.now();
   var p = sh.editId ? S.db.collection('expenses').doc(sh.editId).set(body) : S.db.collection('expenses').add(body);
   p.then(function () {
@@ -906,7 +923,7 @@ S.db = {
     };
   }
 };
-function mapExp(id, x) { return { id: id, cents: Math.round(+x.cents || 0), label: String(x.label || ''), date: String(x.date || ''), payer: String(x.payer || ''), shares: Array.isArray(x.shares) ? x.shares.map(String) : [], createdAt: +x.createdAt || 0, deleted: x.deleted === true, deletedAt: +x.deletedAt || 0, deletedBy: String(x.deletedBy || '') }; }
+function mapExp(id, x) { return { id: id, cents: Math.round(+x.cents || 0), label: String(x.label || ''), date: String(x.date || ''), payer: String(x.payer || ''), shares: Array.isArray(x.shares) ? x.shares.map(String) : [], createdAt: +x.createdAt || 0, deleted: x.deleted === true, deletedAt: +x.deletedAt || 0, deletedBy: String(x.deletedBy || ''), cur: x.cur === 'MUR' ? 'MUR' : 'EUR', orig: x.orig != null ? Math.round(+x.orig) : null, rate: x.rate != null ? +x.rate : null }; }
 function mapMed(id, x) { return { id: id, assetId: String(x.assetId || ''), kind: x.kind === 'video' ? 'video' : 'photo', by: String(x.by || ''), date: String(x.date || ''), caption: String(x.caption || ''), createdAt: +x.createdAt || 0, deleted: x.deleted === true, deletedAt: +x.deletedAt || 0, deletedBy: String(x.deletedBy || '') }; }
 var lastSig = {};
 function loadCol(col) {
