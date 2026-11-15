@@ -1,10 +1,10 @@
 // AG 2027 — mode hors connexion
-const VERSION = 'ag2027-v1';
+const VERSION = 'ag2027-v2';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest',
   'logo.png', 'logo-sm.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'favicon.png',
   'nico.jpg', 'vic.jpg', 'jc.jpg', 'jef.jpg', 'sam.jpg',
-  'data/voyage.json', 'data/golf.json', 'data/change.json', 'data/secret.json'
+  'data/voyage.json', 'data/golf.json', 'data/change.json', 'data/secret.json', 'docs/tableau-des-scores.pdf'
 ];
 
 self.addEventListener('install', (e) => {
