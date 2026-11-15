@@ -514,16 +514,38 @@ function tzParts(tz) {
   var o = {}; f.formatToParts(new Date()).forEach(function (p) { o[p.type] = p.value; });
   return { h: +o.hour % 24, m: +o.minute, s: +o.second, date: o.weekday + ' ' + o.day + ' ' + o.month };
 }
+function sunInfo(lat, lon) {
+  var now = new Date(), y0 = Date.UTC(now.getUTCFullYear(), 0, 1), n = Math.floor((now - y0) / 864e5) + 1;
+  var g = 2 * Math.PI / 365 * (n - 1);
+  var eq = 229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g) - 0.014615 * Math.cos(2 * g) - 0.040849 * Math.sin(2 * g));
+  var de = 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g) - 0.006758 * Math.cos(2 * g) + 0.000907 * Math.sin(2 * g) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
+  var la = lat * Math.PI / 180;
+  var c = Math.cos(90.833 * Math.PI / 180) / (Math.cos(la) * Math.cos(de)) - Math.tan(la) * Math.tan(de);
+  var ha = Math.acos(Math.max(-1, Math.min(1, c))) * 180 / Math.PI;
+  var rise = ((720 - 4 * (lon + ha) - eq) % 1440 + 1440) % 1440, set = ((720 - 4 * (lon - ha) - eq) % 1440 + 1440) % 1440;
+  var m = now.getUTCHours() * 60 + now.getUTCMinutes();
+  var day = rise < set ? (m >= rise && m < set) : (m >= rise || m < set);
+  var base = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return { day: day, rise: new Date(base + rise * 6e4), set: new Date(base + set * 6e4) };
+}
+function hm(d, tz) { return d.toLocaleTimeString('fr-FR', { timeZone: tz, hour: '2-digit', minute: '2-digit' }); }
 function clockFace(id, label, flag) {
   var ticks = ''; for (var i = 0; i < 12; i++) { var a = i * 30 * Math.PI / 180; ticks += '<line x1="' + (60 + 46 * Math.sin(a)).toFixed(1) + '" y1="' + (60 - 46 * Math.cos(a)).toFixed(1) + '" x2="' + (60 + (i % 3 ? 42 : 38) * Math.sin(a)).toFixed(1) + '" y2="' + (60 - (i % 3 ? 42 : 38) * Math.cos(a)).toFixed(1) + '" stroke="' + (i % 3 ? '#9FAAC4' : '#E9C977') + '" stroke-width="' + (i % 3 ? 1.5 : 2.5) + '" stroke-linecap="round"/>'; }
   return '<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-family:var(--serif);font-size:22px;font-weight:700;color:var(--gold2)">' + label + '</span>' +
-    '<svg width="132" height="132" viewBox="0 0 120 120" role="img" aria-label="Heure ' + label + '"><circle cx="60" cy="60" r="54" fill="#0A1630" stroke="#D4AF5A" stroke-width="2.5"/>' + ticks +
+    '<svg width="132" height="132" viewBox="0 0 120 120" role="img" aria-label="Heure ' + label + '"><circle id="' + id + '-f" cx="60" cy="60" r="54" fill="#0A1630" stroke="#D4AF5A" stroke-width="2.5"/><g id="' + id + '-st" fill="#C9D0E0"><circle cx="38" cy="78" r="1"/><circle cx="82" cy="40" r="1.2"/><circle cx="76" cy="84" r=".9"/><circle cx="42" cy="38" r=".9"/></g>' + ticks +
     '<line id="' + id + '-h" x1="60" y1="60" x2="60" y2="34" stroke="#F5EEDC" stroke-width="4" stroke-linecap="round"/><line id="' + id + '-m" x1="60" y1="60" x2="60" y2="22" stroke="#F5EEDC" stroke-width="2.5" stroke-linecap="round"/><line id="' + id + '-s" x1="60" y1="66" x2="60" y2="18" stroke="#E9C977" stroke-width="1.2" stroke-linecap="round"/><circle cx="60" cy="60" r="3.5" fill="#E9C977"/></svg>' +
-    '<span id="' + id + '-d" class="big" style="font-size:30px"></span><span id="' + id + '-w" class="small"></span><span class="small">' + flag + '</span></div>';
+    '<span id="' + id + '-n" style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600"></span><span id="' + id + '-d" class="big" style="font-size:30px"></span><span id="' + id + '-w" class="small"></span><span id="' + id + '-r" class="small" style="font-size:12px;white-space:pre-line;text-align:center"></span><span class="small">' + flag + '</span></div>';
 }
 function tickClocks() {
-  [['ck-p', 'Europe/Paris'], ['ck-m', 'Indian/Mauritius']].forEach(function (c) {
+  [['ck-p', 'Europe/Paris', 48.86, 2.35], ['ck-m', 'Indian/Mauritius', -20.27, 57.76]].forEach(function (c) {
     var el = document.getElementById(c[0] + '-d'); if (!el) return;
+    var si = sunInfo(c[2], c[3]), ink = si.day ? '#0A1630' : '#F5EEDC';
+    document.getElementById(c[0] + '-f').setAttribute('fill', si.day ? '#F5EEDC' : '#0A1630');
+    document.getElementById(c[0] + '-st').style.display = si.day ? 'none' : '';
+    document.getElementById(c[0] + '-h').setAttribute('stroke', ink); document.getElementById(c[0] + '-m').setAttribute('stroke', ink);
+    var nl = document.getElementById(c[0] + '-n'), lbl = si.day ? 'Jour' : 'Nuit';
+    if (nl.getAttribute('data-v') !== lbl) { nl.setAttribute('data-v', lbl); nl.innerHTML = wxIcon(0, si.day, 18) + '<span style="color:' + (si.day ? 'var(--gold2)' : 'var(--soft)') + '">' + lbl + '</span>'; }
+    document.getElementById(c[0] + '-r').textContent = 'Lever ' + hm(si.rise, c[1]) + '\nCoucher ' + hm(si.set, c[1]);
     var p = tzParts(c[1]);
     el.textContent = pad(p.h) + ':' + pad(p.m);
     document.getElementById(c[0] + '-w').textContent = p.date.charAt(0).toUpperCase() + p.date.slice(1);
