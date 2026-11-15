@@ -271,7 +271,7 @@ function vVoyage() {
     '<section class="sec"><div class="card hl">' + leg('Aller · ' + (al.date || 'ven. 22 janv.'), { de: al.de || 'PAR', vers: al.vers || 'MRU', vol: al.vol, heureDepart: al.heureDepart, heureArrivee: al.heureArrivee }) +
     '<div style="border-top:1px solid rgba(212,175,90,.2)"></div>' + leg('Retour · ' + (re.date || 'dim. 31 janv.'), { de: re.de || 'MRU', vers: re.vers || 'PAR', vol: re.vol, heureDepart: re.heureDepart, heureArrivee: re.heureArrivee }) + '</div></section>' +
     '<section class="sec" style="gap:4px"><h2 class="script" style="margin-bottom:8px">Jour par jour</h2>' + days + '</section>' +
-    '<section class="sec grid2" style="display:grid"><div class="kv"><span>Décalage</span><span>Paris <span class="paris-time">' + parisTime() + '</span></span><span style="font-size:11px;color:var(--mute);text-transform:none;letter-spacing:0;font-weight:400">Maurice = Paris + 3 h</span></div><button type="button" class="kv" data-act="openConv" style="border:0;text-align:left;color:inherit;font:inherit;cursor:pointer;border:1px solid rgba(212,175,90,.35);position:relative"><span>Roupie (MUR)</span><span>' + (S.change && S.change.taux ? '500 Rs ≈ ' + (500 / S.change.taux).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : 'Roupie (MUR)') + '</span>' + (S.change && S.change.taux ? '<span style="font-size:11px;color:var(--mute);text-transform:none;letter-spacing:0;font-weight:400">1 € = ' + String(S.change.taux).replace('.', ',') + ' Rs' + (S.change.date ? ' · ' + esc(fmtDate(S.change.date)) : '') + '</span>' : '') + '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E9C977" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position:absolute;top:12px;right:12px"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="8" y="5.5" width="8" height="4" rx=".5"/><path d="M8.5 13h.01M12 13h.01M15.5 13h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg></button><button type="button" class="kv" data-act="openAgent" style="text-align:left;color:inherit;font:inherit;cursor:pointer;border:1px solid rgba(212,175,90,.35);position:relative"><span>Voyagiste</span><span style="padding-right:22px">Golf Autour du Monde</span><span style="font-size:11px;color:var(--mute);text-transform:none;letter-spacing:0;font-weight:400">Contacts et forfait</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E9C977" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position:absolute;top:12px;right:12px"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.8 2z"/></svg></button><button type="button" class="kv" data-act="openPlug" style="text-align:left;color:inherit;font:inherit;cursor:pointer;border:1px solid rgba(212,175,90,.35);position:relative"><span>Prises</span><span>Type C / G</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E9C977" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position:absolute;top:12px;right:12px"><path d="M9 2v5M15 2v5M6 7h12v4a6 6 0 0 1-12 0zM12 17v5"/></svg></button></section>';
+    '<section class="sec grid2" style="display:grid"><button type="button" class="kv" data-act="openClock" style="text-align:left;color:inherit;font:inherit;cursor:pointer;border:1px solid rgba(212,175,90,.35);position:relative"><span>Décalage</span><span>Paris <span class="paris-time">' + parisTime() + '</span></span><span style="font-size:11px;color:var(--mute);text-transform:none;letter-spacing:0;font-weight:400">Maurice = Paris + 3 h</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E9C977" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position:absolute;top:12px;right:12px"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button><button type="button" class="kv" data-act="openConv" style="border:0;text-align:left;color:inherit;font:inherit;cursor:pointer;border:1px solid rgba(212,175,90,.35);position:relative"><span>Roupie (MUR)</span><span>' + (S.change && S.change.taux ? '500 Rs ≈ ' + (500 / S.change.taux).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : 'Roupie (MUR)') + '</span>' + (S.change && S.change.taux ? '<span style="font-size:11px;color:var(--mute);text-transform:none;letter-spacing:0;font-weight:400">1 € = ' + String(S.change.taux).replace('.', ',') + ' Rs' + (S.change.date ? ' · ' + esc(fmtDate(S.change.date)) : '') + '</span>' : '') + '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E9C977" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position:absolute;top:12px;right:12px"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="8" y="5.5" width="8" height="4" rx=".5"/><path d="M8.5 13h.01M12 13h.01M15.5 13h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg></button><button type="button" class="kv" data-act="openAgent" style="text-align:left;color:inherit;font:inherit;cursor:pointer;border:1px solid rgba(212,175,90,.35);position:relative"><span>Voyagiste</span><span style="padding-right:22px">Golf Autour du Monde</span><span style="font-size:11px;color:var(--mute);text-transform:none;letter-spacing:0;font-weight:400">Contacts et forfait</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E9C977" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position:absolute;top:12px;right:12px"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.8 2z"/></svg></button><button type="button" class="kv" data-act="openPlug" style="text-align:left;color:inherit;font:inherit;cursor:pointer;border:1px solid rgba(212,175,90,.35);position:relative"><span>Prises</span><span>Type C / G</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E9C977" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position:absolute;top:12px;right:12px"><path d="M9 2v5M15 2v5M6 7h12v4a6 6 0 0 1-12 0zM12 17v5"/></svg></button></section>';
 }
 
 function vMeteo() {
@@ -439,6 +439,12 @@ function renderLayer() {
       '<div class="row" style="justify-content:space-between;gap:8px;padding:8px 12px;border-radius:12px;background:var(--bg)"><span style="color:var(--soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(P.mail) + '</span><button type="button" class="pill" data-copy="' + esc(P.mail) + '" style="min-height:34px">Copier</button></div></div>' +
       '<div class="row" style="gap:22px;justify-content:center;margin-top:6px">' + act('tel:' + num, 'Appeler', svgTel) + act('mailto:' + P.mail, 'E-mail', svgMail) + act('https://wa.me/' + wa, 'WhatsApp', svgWa, true) + '</div></div></div>';
   }
+  if (S.clock) {
+    var df = tzDiff();
+    h += '<div class="modal" data-act="closeClockBg"><div class="box" role="dialog" aria-labelledby="ckt" style="gap:18px"><div class="row" style="justify-content:space-between"><span id="ckt" style="font-family:var(--serif);font-size:26px;font-weight:700">Heures</span><button type="button" class="icon-btn" data-act="closeClock" aria-label="Fermer">' + ic('x', 18, 'currentColor', 2) + '</button></div>' +
+      '<div class="grid2" style="gap:8px">' + clockFace('ck-p', 'Paris', 'France') + clockFace('ck-m', 'Maurice', 'Île Maurice') + '</div>' +
+      '<div class="card" style="background:var(--bg);padding:12px 14px;text-align:center;font-size:14px;color:var(--soft)">Maurice = Paris ' + (df >= 0 ? '+ ' : '− ') + Math.abs(df) + ' h</div></div></div>';
+  }
   if (S.agent) {
     var li = function (k, v) { return '<div style="display:flex;flex-direction:column;gap:2px;padding:8px 0;border-bottom:1px solid rgba(159,170,196,.12)"><span class="small" style="text-transform:uppercase;letter-spacing:1px;font-size:11px">' + k + '</span><span style="font-size:14px;line-height:1.45">' + v + '</span></div>'; };
     h += '<div class="modal" data-act="closeAgentBg"><div class="box" role="dialog" aria-labelledby="agt" style="gap:12px;max-height:88vh;overflow-y:auto"><div class="row" style="justify-content:space-between"><span id="agt" style="font-family:var(--serif);font-size:26px;font-weight:700">Voyagiste</span><button type="button" class="icon-btn" data-act="closeAgent" aria-label="Fermer">' + ic('x', 18, 'currentColor', 2) + '</button></div>' +
@@ -480,7 +486,7 @@ function renderLayer() {
     h += '<div class="modal"><div class="box" role="alertdialog" aria-labelledby="cft"><span id="cft" style="font-family:var(--serif);font-size:26px;font-weight:700">' + esc(S.confirm.title) + '</span><span style="font-size:14px;color:var(--soft);line-height:1.5">' + esc(S.confirm.text) + '</span><div class="row" style="gap:10px"><button type="button" class="btn ghost grow" data-act="cfNo">Annuler</button><button type="button" class="btn grow" style="background:#B83A48;color:#fff" data-act="cfYes">Supprimer</button></div></div></div>';
   }
   L.innerHTML = h;
-  document.body.style.overflow = (S.detail || S.trash || S.sheet || S.lightbox || S.card || S.conv || S.plug || S.agent || S.person) ? 'hidden' : '';
+  document.body.style.overflow = (S.detail || S.trash || S.sheet || S.lightbox || S.card || S.conv || S.plug || S.agent || S.person || S.clock) ? 'hidden' : '';
   if (S.sheet) { var f = L.querySelector('[data-autofocus]'); if (f) setTimeout(function () { try { f.focus(); } catch (e) {} }, 30); }
 }
 
@@ -502,6 +508,34 @@ function wxIcon(code, day, size) {
   else if (code >= 95) g = cloud(-3) + '<path stroke="' + gold + '" d="M13 15l-2.5 4h3L11 23"/>';
   else g = cloud(0);
   return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke-width="' + sw + '" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="' + esc(WMO[code] || 'Météo') + '">' + g + '</svg>';
+}
+function tzParts(tz) {
+  var f = new Intl.DateTimeFormat('fr-FR', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, weekday: 'long', day: 'numeric', month: 'long' });
+  var o = {}; f.formatToParts(new Date()).forEach(function (p) { o[p.type] = p.value; });
+  return { h: +o.hour % 24, m: +o.minute, s: +o.second, date: o.weekday + ' ' + o.day + ' ' + o.month };
+}
+function clockFace(id, label, flag) {
+  var ticks = ''; for (var i = 0; i < 12; i++) { var a = i * 30 * Math.PI / 180; ticks += '<line x1="' + (60 + 46 * Math.sin(a)).toFixed(1) + '" y1="' + (60 - 46 * Math.cos(a)).toFixed(1) + '" x2="' + (60 + (i % 3 ? 42 : 38) * Math.sin(a)).toFixed(1) + '" y2="' + (60 - (i % 3 ? 42 : 38) * Math.cos(a)).toFixed(1) + '" stroke="' + (i % 3 ? '#9FAAC4' : '#E9C977') + '" stroke-width="' + (i % 3 ? 1.5 : 2.5) + '" stroke-linecap="round"/>'; }
+  return '<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-family:var(--serif);font-size:22px;font-weight:700;color:var(--gold2)">' + label + '</span>' +
+    '<svg width="132" height="132" viewBox="0 0 120 120" role="img" aria-label="Heure ' + label + '"><circle cx="60" cy="60" r="54" fill="#0A1630" stroke="#D4AF5A" stroke-width="2.5"/>' + ticks +
+    '<line id="' + id + '-h" x1="60" y1="60" x2="60" y2="34" stroke="#F5EEDC" stroke-width="4" stroke-linecap="round"/><line id="' + id + '-m" x1="60" y1="60" x2="60" y2="22" stroke="#F5EEDC" stroke-width="2.5" stroke-linecap="round"/><line id="' + id + '-s" x1="60" y1="66" x2="60" y2="18" stroke="#E9C977" stroke-width="1.2" stroke-linecap="round"/><circle cx="60" cy="60" r="3.5" fill="#E9C977"/></svg>' +
+    '<span id="' + id + '-d" class="big" style="font-size:30px"></span><span id="' + id + '-w" class="small"></span><span class="small">' + flag + '</span></div>';
+}
+function tickClocks() {
+  [['ck-p', 'Europe/Paris'], ['ck-m', 'Indian/Mauritius']].forEach(function (c) {
+    var el = document.getElementById(c[0] + '-d'); if (!el) return;
+    var p = tzParts(c[1]);
+    el.textContent = pad(p.h) + ':' + pad(p.m);
+    document.getElementById(c[0] + '-w').textContent = p.date.charAt(0).toUpperCase() + p.date.slice(1);
+    var rot = function (id, deg) { var e = document.getElementById(id); if (e) e.setAttribute('transform', 'rotate(' + deg.toFixed(1) + ' 60 60)'); };
+    rot(c[0] + '-h', (p.h % 12) * 30 + p.m * 0.5); rot(c[0] + '-m', p.m * 6 + p.s * 0.1); rot(c[0] + '-s', p.s * 6);
+  });
+}
+setInterval(tickClocks, 1000);
+function tzDiff() {
+  var a = tzParts('Europe/Paris'), b = tzParts('Indian/Mauritius');
+  var d = ((b.h * 60 + b.m) - (a.h * 60 + a.m) + 1440) % 1440; if (d > 720) d -= 1440;
+  return Math.round(d / 60);
 }
 function parisTime() {
   try { return new Date().toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
@@ -591,7 +625,7 @@ function render() {
 function route() {
   var h = (location.hash || '').replace('#', '');
   S.view = ['voyage', 'meteo', 'golf', 'budget', 'medias'].indexOf(h) >= 0 ? h : 'accueil';
-  S.detail = false; S.trash = false; S.card = null; S.conv = false; S.plug = false; S.agent = false; S.person = null; S.sheet = null; S.lightbox = null; S.confirm = null;
+  S.detail = false; S.trash = false; S.card = null; S.conv = false; S.plug = false; S.agent = false; S.person = null; S.clock = false; S.sheet = null; S.lightbox = null; S.confirm = null;
   render(); window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);
@@ -632,6 +666,9 @@ document.addEventListener('click', function (ev) {
     case 'openPlug': S.plug = true; renderLayer(); break;
     case 'closePerson': S.person = null; renderLayer(); break;
     case 'closePersonBg': if (ev.target === t) { S.person = null; renderLayer(); } break;
+    case 'openClock': S.clock = true; renderLayer(); tickClocks(); break;
+    case 'closeClock': S.clock = false; renderLayer(); break;
+    case 'closeClockBg': if (ev.target === t) { S.clock = false; renderLayer(); } break;
     case 'openAgent': S.agent = true; renderLayer(); break;
     case 'closeAgent': S.agent = false; renderLayer(); break;
     case 'closeAgentBg': if (ev.target === t) { S.agent = false; renderLayer(); } break;
