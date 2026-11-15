@@ -4,7 +4,9 @@
   "vers": "MRU",
   "heureDepart": "21h15",
   "heureArrivee": "11h55 (23 janv.)",
-  "vol": "Corsair"
+  "vol": "Corsair SS958",
+  "numero": "SS958",
+  "suivi": "https://www.flightaware.com/live/flight/CRL958"
  },
  "retour": {
   "date": "sam. 30 janv.",
@@ -12,7 +14,9 @@
   "vers": "ORY",
   "heureDepart": "21h40",
   "heureArrivee": "7h00 (31 janv.)",
-  "vol": "Corsair"
+  "vol": "Corsair SS959",
+  "numero": "SS959",
+  "suivi": "https://www.flightaware.com/live/flight/CRL959"
  },
  "jours": {
   "22": {
