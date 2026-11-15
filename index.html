@@ -733,20 +733,30 @@ function downloadMedia(id) {
     setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
   }).catch(function () { toast('Téléchargement impossible pour le moment.'); });
 }
-function shrinkImage(f) {
-  return new Promise(function (res) {
-    if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { res(f); return; }
-    var url = URL.createObjectURL(f), img = new Image();
-    img.onload = function () {
-      var max = 2048, w = img.naturalWidth, h = img.naturalHeight, k = Math.min(1, max / Math.max(w, h));
-      if (k === 1 && f.size < 1.5e6) { URL.revokeObjectURL(url); res(f); return; }
-      var c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-      c.toBlob(function (b) { URL.revokeObjectURL(url); res(b && b.size < f.size ? b : f); }, 'image/jpeg', 0.85);
-    };
-    img.onerror = function () { URL.revokeObjectURL(url); res(f); };
-    img.src = url;
+var MAX_SIDE = 2560, JPEG_Q = 0.88;
+function isHeic(f) { return /hei[cf]/i.test(f.type) || /\.hei[cf]$/i.test(f.name || ''); }
+function loadHeicLib() {
+  if (window.heic2any) return Promise.resolve(window.heic2any);
+  return new Promise(function (res, rej) { var s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js'; s.onload = function () { res(window.heic2any); }; s.onerror = rej; document.head.appendChild(s); });
+}
+function decodeImage(blob) {
+  if (window.createImageBitmap) return createImageBitmap(blob, { imageOrientation: 'from-image' }).catch(function () { return createImageBitmap(blob); });
+  return new Promise(function (res, rej) { var u = URL.createObjectURL(blob), i = new Image(); i.onload = function () { res(i); }; i.onerror = rej; i.src = u; });
+}
+function toJpeg(blob, original) {
+  return decodeImage(blob).then(function (img) {
+    var w = img.width || img.naturalWidth, h = img.height || img.naturalHeight, k = Math.min(1, MAX_SIDE / Math.max(w, h));
+    if (original && original.type === 'image/jpeg' && k === 1 && original.size < 2.5e6) return original;
+    var c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
+    var x = c.getContext('2d'); x.imageSmoothingQuality = 'high'; x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+    return new Promise(function (res) { c.toBlob(function (b) { res(b || original || blob); }, 'image/jpeg', JPEG_Q); });
   });
+}
+function shrinkImage(f) {
+  var p = isHeic(f)
+    ? toJpeg(f, null).catch(function () { return loadHeicLib().then(function (h) { return h({ blob: f, toType: 'image/jpeg', quality: 0.92 }); }).then(function (b) { return toJpeg(Array.isArray(b) ? b[0] : b, null); }); })
+    : toJpeg(f, f);
+  return p.catch(function () { return f; });
 }
 function uploadFiles(files) {
   if (!files || !files.length || !S.db) return;
@@ -756,9 +766,9 @@ function uploadFiles(files) {
     var f = list.shift();
     if (!f) { toast(done + ' média' + (done > 1 ? 's' : '') + ' partagé' + (done > 1 ? 's' : '') + (failed ? ' · ' + failed + ' échec(s) (50 Mo max.)' : '') + '.'); return; }
     var isVid = /^video\//.test(f.type);
-    (isVid ? Promise.resolve(f) : shrinkImage(f)).then(function (blob) {
+    (isVid || !/^image\//.test(f.type || 'image/') && !isHeic(f) ? Promise.resolve(f) : shrinkImage(f)).then(function (blob) {
       if (blob.size > 50 * 1024 * 1024) throw { code: 'too_large' };
-      var ext = isVid ? ((f.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4') : (blob.type === 'image/png' ? 'png' : blob.type === 'image/webp' ? 'webp' : 'jpg');
+      var ext = isVid ? ((f.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4') : (blob.type === 'image/jpeg' ? 'jpg' : blob.type === 'image/png' ? 'png' : blob.type === 'image/webp' ? 'webp' : 'jpg');
       var path = Date.now() + '_' + Math.random().toString(36).slice(2, 8) + '.' + ext;
       return SB.upload(path, blob, blob.type || f.type).then(function () {
         return S.db.collection('medias').add({ assetId: path, kind: isVid ? 'video' : 'photo', by: '', date: iso(new Date()), caption: '', createdAt: Date.now() });
