@@ -953,7 +953,18 @@ function startData() {
   loadJson('voyage', 'voyage'); loadJson('golf', 'golf');
   loadWeather(); loadRate();
   setInterval(function () { if (!document.hidden) { loadCol('expenses'); loadCol('medias'); } }, 20000);
-  setInterval(function () { if (!document.hidden) { loadJson('voyage', 'voyage'); loadJson('golf', 'golf'); } }, 300000);
+  var pageSig = null;
+  function pageVersion() { return fetch('index.html?v=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : null; }).then(function (x) { return x ? x.length + ':' + x.slice(-400) : null; }).catch(function () { return null; }); }
+  pageVersion().then(function (v) { pageSig = v; });
+  function refreshAll() {
+    loadCol('expenses'); loadCol('medias'); loadJson('voyage', 'voyage'); loadJson('golf', 'golf'); loadWeather(); loadRate();
+    pageVersion().then(function (v) {
+      var busy = S.sheet || S.detail || S.trash || S.card || S.conv || S.plug || S.agent || S.person || S.clock || S.lightbox || S.confirm;
+      if (v && pageSig && v !== pageSig && !busy) location.reload();
+      else render();
+    });
+  }
+  setInterval(function () { if (!document.hidden) refreshAll(); }, 300000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) { loadCol('expenses'); loadCol('medias'); loadJson('golf', 'golf'); loadJson('voyage', 'voyage'); } });
 }
 function showGate(err) {
