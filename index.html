@@ -81,6 +81,16 @@ nav.tabs a.on{color:var(--gold2)}
 .seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:4px;border-radius:14px;background:var(--card);margin:14px 20px 0}
 .seg button{min-height:42px;border:0;border-radius:10px;background:transparent;color:var(--soft);font-size:13px;font-weight:600}
 .seg button.on{background:var(--gold);color:var(--bg)}
+.podium{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;align-items:end;margin-top:8px}
+.pcol{display:flex;flex-direction:column;align-items:center;min-width:0}
+.pbtn{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;padding:4px 0 8px;min-width:44px;width:100%;position:relative}
+.pbtn .crown{margin-bottom:-2px}
+.pname{font-size:13px;font-weight:600}
+.pscore{font-size:13px;font-weight:700;color:var(--gold2);font-variant-numeric:tabular-nums}
+.pstep{width:100%;border-radius:10px 10px 0 0;background:linear-gradient(180deg,#22386E,#16264F);border:1px solid rgba(212,175,90,.35);border-bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8px;gap:6px}
+.pstep.gold{background:linear-gradient(180deg,#3A3A5A,#22386E);border-color:var(--gold)}
+.prank{font-size:22px;font-weight:800;color:var(--gold2)}
+.pstep .dots{gap:2px}.pstep .dots span{width:6px;height:4px}
 .rank{display:flex;flex-direction:column;border-radius:16px;background:var(--card);border:1px solid transparent;overflow:hidden}
 .rank.first{background:var(--card2);border-color:var(--gold)}
 .rank>button{display:flex;align-items:center;gap:12px;padding:12px 14px;background:none;border:0;text-align:left;width:100%}
@@ -309,25 +319,20 @@ function vGolf() {
   }).join('');
   var body = '';
   if (S.golfTab === 'rank') {
-    body = rows.map(function (r, i) {
-      var parts = r.parties || [];
-      var dots = '';
+    var order = [3, 1, 0, 2, 4], heights = [128, 100, 80, 60, 44];
+    body = '<div class="podium" role="list" aria-label="Classement">' + order.map(function (idx) {
+      var r = rows[idx]; if (!r) return '';
+      var pos = r.total != null ? idx + 1 : null;
+      var parts = r.parties || [], dots = '';
       for (var k = 0; k < 6; k++) dots += '<span class="' + (parts[k] && parts[k].brut != null ? TEAM_OF[k][r.nom] || '' : '') + '"></span>';
-      var open = S.golfOpen === r.nom;
-      var det = '';
-      if (open) {
-        det = '<div class="rdet"><div class="rr h"><span>Jour</span><span>Brut/hcp</span><span>Net</span><span>Bonus</span><span>Final</span></div>';
-        for (var p = 0; p < 6; p++) {
-          var x = parts[p], prev = p > 0 ? parts[p - 1] : null;
-          var hcpNext = (x && x.hcp != null) ? x.hcp : (p === 0 ? IDX[r.nom] : (prev && prev.brut != null && prev.par != null ? (+prev.brut - +prev.par) : null));
-          var played = x && x.brut != null;
-          if (!played) x = null;
-          det += '<button type="button" class="rr" data-card="' + esc(r.nom) + ':' + p + '" aria-label="Carte de score du ' + GOLF_DAYS[p] + ' janvier"><span style="color:var(--gold2);text-decoration:underline;text-underline-offset:3px">' + GOLF_DAYS[p] + '/01</span>' + (x ? '<span>' + fnum(x.brut) + '/' + fnum(x.hcp) + '</span><span>' + fnum(x.net) + '</span><span>' + (x.bonus ? '−' + fnum(x.bonus) : '—') + '</span><span style="font-weight:600">' + fnum(x.final) + '</span>' : (hcpNext != null ? '<span>—/<span style="color:var(--gold2)">' + esc(String(hcpNext).replace('.', ',')) + '</span></span>' : '<span>—</span>') + '<span>—</span><span>—</span><span>—</span>') + '</button>';
-        }
-        det += '<p class="small" style="margin:8px 0 0">Touche un jour pour voir la carte des 18 trous.</p></div>';
-      }
-      return '<div class="rank' + (i === 0 && hasData ? ' first' : '') + '"><button type="button" data-gopen="' + esc(r.nom) + '" aria-expanded="' + open + '"><span class="big" style="width:22px;font-size:24px;color:var(--gold2);text-align:center">' + (r.total != null ? (i + 1) : '–') + '</span><span class="av" style="width:40px;height:40px;font-size:16px;border-width:1.5px">' + avInner(r.nom) + '</span><span class="grow" style="display:flex;flex-direction:column;gap:6px"><span style="font-size:15px;font-weight:600">' + esc(r.nom) + '</span><span class="dots">' + dots + '</span></span><span style="display:flex;flex-direction:column;align-items:flex-end"><span class="big" style="font-size:24px">' + (r.total != null ? esc(String(r.total).replace('.', ',')) : '—') + '</span><span style="font-size:11px;color:var(--mute)">net cumulé</span></span></button>' + det + '</div>';
-    }).join('') + '<p class="small" style="margin:2px 0 0">' + (g.majLe ? 'Mis à jour le ' + esc(g.majLe) + '. ' : '') + 'Total le plus bas = vainqueur du séjour. Touche un joueur pour le détail. Barres : bleu = équipe Bleue, rose = équipe Rouge.</p>';
+      var lead = pos === 1;
+      return '<div class="pcol" role="listitem"><button type="button" class="pbtn" data-gopen="' + esc(r.nom) + '" aria-label="Résultats de ' + esc(r.nom) + '">' +
+        (lead ? '<svg class="crown" width="26" height="18" viewBox="0 0 26 18" aria-hidden="true"><path d="M2 16 4 4l6 6 3-8 3 8 6-6 2 12z" fill="#E9C977"/></svg>' : '') +
+        '<span class="av" style="width:' + (lead ? 62 : 52) + 'px;height:' + (lead ? 62 : 52) + 'px;border-width:' + (lead ? 3 : 2) + 'px">' + avInner(r.nom) + '</span>' +
+        '<span class="pname">' + esc(r.nom) + '</span><span class="pscore">' + (r.total != null ? esc(String(r.total).replace('.', ',')) : '—') + '</span></button>' +
+        '<div class="pstep' + (lead ? ' gold' : '') + '" style="height:' + heights[idx] + 'px"><span class="prank">' + (pos || '–') + '</span><span class="dots">' + dots + '</span></div></div>';
+    }).join('') + '</div>' +
+    '<p class="small" style="margin:2px 0 0;text-align:center">' + (g.majLe ? 'Mis à jour le ' + esc(g.majLe) + '. ' : '') + 'Net cumulé : le plus bas gagne. Touche une photo pour les résultats.</p>';
   } else if (S.golfTab === 'games') {
     body = TEAMS.map(function (t, k) {
       var res = (g.parties || [])[k];
@@ -429,6 +434,7 @@ function renderLayer() {
       }).join('') : '<div class="card" style="text-align:center;color:var(--soft);font-size:14px">La corbeille est vide.</div>') + '</section></div></div>';
   }
   if (S.sheet) h += sheetHtml();
+  if (S.golfOpen && S.view === 'golf') h += golfPlayerHtml(S.golfOpen);
   if (S.card) h += scoreCardHtml();
   if (S.person && CONTACTS[S.person]) {
     var P = CONTACTS[S.person], num = P.tel.replace(/[^+\d]/g, ''), wa = num.replace('+', '');
@@ -491,7 +497,7 @@ function renderLayer() {
     h += '<div class="modal"><div class="box" role="alertdialog" aria-labelledby="cft"><span id="cft" style="font-family:var(--serif);font-size:26px;font-weight:700">' + esc(S.confirm.title) + '</span><span style="font-size:14px;color:var(--soft);line-height:1.5">' + esc(S.confirm.text) + '</span><div class="row" style="gap:10px"><button type="button" class="btn ghost grow" data-act="cfNo">Annuler</button><button type="button" class="btn grow" style="background:#B83A48;color:#fff" data-act="cfYes">Supprimer</button></div></div></div>';
   }
   L.innerHTML = h;
-  document.body.style.overflow = (S.detail || S.trash || S.sheet || S.lightbox || S.card || S.conv || S.plug || S.agent || S.person || S.clock) ? 'hidden' : '';
+  document.body.style.overflow = (S.detail || S.trash || S.sheet || S.lightbox || S.card || S.conv || S.plug || S.agent || S.person || S.clock || S.golfOpen) ? 'hidden' : '';
   if (S.sheet) { var f = L.querySelector('[data-autofocus]'); if (f) setTimeout(function () { try { f.focus(); } catch (e) {} }, 30); }
 }
 
@@ -593,6 +599,21 @@ function plugSvg(kind) {
     : '<rect x="22" y="22" width="76" height="62" rx="10" fill="#2B3E6E" stroke="#9FAAC4" stroke-width="2"/><rect x="55" y="2" width="10" height="22" fill="#C9D0E0"/><rect x="33" y="6" width="14" height="18" fill="#C9D0E0"/><rect x="73" y="6" width="14" height="18" fill="#C9D0E0"/><rect x="56" y="84" width="8" height="32" fill="#2B3E6E"/>';
   return '<svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="Fiche de type ' + kind + '">' + body + '</svg>';
 }
+function golfPlayerHtml(nom) {
+  var g = S.golf || {}, IDX = g.index || {};
+  var r = (g.classement || []).filter(function (x) { return x.nom === nom; })[0] || { nom: nom, total: null, parties: [] };
+  var parts = r.parties || [];
+  var det = '<div class="rdet" style="padding:0"><div class="rr h"><span>Jour</span><span>Brut/hcp</span><span>Net</span><span>Bonus</span><span>Final</span></div>';
+  for (var p = 0; p < 6; p++) {
+    var x = parts[p], prev = p > 0 ? parts[p - 1] : null;
+    var hcpNext = (x && x.hcp != null) ? x.hcp : (p === 0 ? IDX[nom] : (prev && prev.brut != null && prev.par != null ? (+prev.brut - +prev.par) : null));
+    if (!(x && x.brut != null)) x = null;
+    det += '<button type="button" class="rr" data-card="' + esc(nom) + ':' + p + '" aria-label="Carte de score du ' + GOLF_DAYS[p] + ' janvier"><span style="color:var(--gold2);text-decoration:underline;text-underline-offset:3px">' + GOLF_DAYS[p] + '/01</span>' + (x ? '<span>' + fnum(x.brut) + '/' + fnum(x.hcp) + '</span><span>' + fnum(x.net) + '</span><span>' + (x.bonus ? '−' + fnum(x.bonus) : '—') + '</span><span style="font-weight:600">' + fnum(x.final) + '</span>' : (hcpNext != null ? '<span>—/<span style="color:var(--gold2)">' + esc(String(hcpNext).replace('.', ',')) + '</span></span>' : '<span>—</span>') + '<span>—</span><span>—</span><span>—</span>') + '</button>';
+  }
+  det += '</div>';
+  return '<div class="modal" data-act="closeGolfBg"><div class="box" role="dialog" aria-labelledby="gpt" style="gap:14px;max-height:88vh;overflow-y:auto"><div class="row" style="justify-content:space-between"><div class="row" style="gap:12px"><span class="av" style="width:52px;height:52px">' + avInner(nom) + '</span><div><div id="gpt" style="font-family:var(--serif);font-size:24px;font-weight:700">' + esc(nom) + '</div><div class="small">Net cumulé : <strong style="color:var(--gold2)">' + (r.total != null ? esc(String(r.total).replace('.', ',')) : '—') + '</strong></div></div></div><button type="button" class="icon-btn" data-act="closeGolf" aria-label="Fermer">' + ic('x', 18, 'currentColor', 2) + '</button></div>' + det +
+    '<p class="small" style="margin:0">Touche un jour pour voir la carte des 18 trous.</p></div></div>';
+}
 function strokesOn(hcp, si) {
   var H = Math.round(+hcp || 0);
   if (!si) return 0;
@@ -624,7 +645,7 @@ function scoreCardHtml() {
   }
   var brutT = part.brut != null ? part.brut : (nb === 18 ? tb : null);
   var netT = part.net != null ? part.net : (brutT != null && hcp != null ? Math.round((brutT - hcp) * 10) / 10 : null);
-  return '<div class="ov" role="dialog" aria-label="Carte de score"><div class="in">' + header('Carte de score', esc(c.nom)) +
+  return '<div class="ov" role="dialog" aria-label="Carte de score" style="z-index:70"><div class="in">' + header('Carte de score', esc(c.nom)) +
     '<div class="row" style="margin:6px 20px 0;justify-content:space-between"><button type="button" data-act="closeCard" style="min-height:44px;border:0;background:none;color:var(--gold2);font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px;padding:0">' + ic('back', 18, 'currentColor', 2) + 'Golf</button><span class="small" style="font-size:13px">' + golfLabel(k) + '</span></div>' +
     '<section class="sec" style="margin-top:8px"><div class="card" style="flex-direction:row;justify-content:space-between;padding:14px 18px"><div><div class="small">Parcours</div><div style="font-weight:600">' + esc(course.nom || 'À venir') + '</div></div><div style="text-align:right"><div class="small">Handicap du jour</div><div style="font-weight:600;color:var(--gold2)">' + fnum(hcp) + '</div></div></div>' +
     '<div class="card" style="padding:6px 10px 0;overflow:hidden"><table class="sc"><thead><tr><th>Trou</th><th>Par</th><th>Hcp</th><th>Brut</th><th>Net</th></tr></thead><tbody>' + body +
@@ -679,7 +700,7 @@ function render() {
 function route() {
   var h = (location.hash || '').replace('#', '');
   S.view = ['voyage', 'meteo', 'golf', 'budget', 'medias'].indexOf(h) >= 0 ? h : 'accueil';
-  S.detail = false; S.trash = false; S.card = null; S.conv = false; S.plug = false; S.agent = false; S.person = null; S.clock = false; S.sheet = null; S.lightbox = null; S.confirm = null;
+  S.detail = false; S.trash = false; S.card = null; S.conv = false; S.plug = false; S.agent = false; S.person = null; S.clock = false; S.golfOpen = null; S.sheet = null; S.lightbox = null; S.confirm = null;
   render(); window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);
@@ -698,7 +719,7 @@ document.addEventListener('click', function (ev) {
   if (t.hasAttribute('data-cur') && S.sheet) { S.sheet.draft.cur = t.getAttribute('data-cur'); lsSet('ag27-cur', S.sheet.draft.cur); renderLayer(); return; }
   if (t.hasAttribute('data-person')) { S.person = t.getAttribute('data-person'); renderLayer(); return; }
   if (t.hasAttribute('data-card')) { var cp = t.getAttribute('data-card').split(':'); S.card = { nom: cp[0], p: +cp[1] }; renderLayer(); return; }
-  if (t.hasAttribute('data-gopen')) { var g = t.getAttribute('data-gopen'); S.golfOpen = S.golfOpen === g ? null : g; render(); return; }
+  if (t.hasAttribute('data-gopen')) { S.golfOpen = t.getAttribute('data-gopen'); renderLayer(); return; }
   if (t.hasAttribute('data-mf')) { S.mediaFilter = t.getAttribute('data-mf'); render(); return; }
   if (t.hasAttribute('data-open')) { S.lightbox = t.getAttribute('data-open'); renderLayer(); return; }
   if (t.hasAttribute('data-restore')) { if (!S.db || S.readOnly) { toast('Lecture seule : restauration impossible.'); return; } var rp = t.getAttribute('data-restore').split(':'); restore(rp[0], rp[1]); return; }
@@ -722,6 +743,8 @@ document.addEventListener('click', function (ev) {
     case 'closePerson': S.person = null; renderLayer(); break;
     case 'closePersonBg': if (ev.target === t) { S.person = null; renderLayer(); } break;
     case 'openClock': S.clock = true; renderLayer(); tickClocks(); break;
+    case 'closeGolf': S.golfOpen = null; renderLayer(); break;
+    case 'closeGolfBg': if (ev.target === t) { S.golfOpen = null; renderLayer(); } break;
     case 'closeClock': S.clock = false; renderLayer(); break;
     case 'closeClockBg': if (ev.target === t) { S.clock = false; renderLayer(); } break;
     case 'openAgent': S.agent = true; renderLayer(); break;
