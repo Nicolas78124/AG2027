@@ -282,11 +282,11 @@ function vMeteo() {
   var strip = '';
   for (var n = 22; n <= 31; n++) {
     var dt = new Date(2027, 0, n), j = jours[String(n)] || {};
-    strip += '<div class="wday' + (todayN === n ? ' today' : '') + '"><span style="font-size:11px;color:var(--mute);text-transform:uppercase">' + DOWS[dt.getDay()] + '</span><span class="big" style="font-size:20px">' + n + '</span>' + ic(j.ciel && /sol|clair|ensol/i.test(j.ciel) ? 'meteo' : 'cloud', 22, '#9FAAC4', 1.5) + '<span style="font-size:13px;font-weight:600">' + (j.tmax != null ? esc(j.tmax) + '°' : '--°') + '</span><span style="font-size:11px;color:var(--mute)">' + (j.tmin != null ? esc(j.tmin) + '°' : '') + '</span></div>';
+    strip += '<div class="wday' + (todayN === n ? ' today' : '') + '"><span style="font-size:11px;color:var(--mute);text-transform:uppercase">' + DOWS[dt.getDay()] + '</span><span class="big" style="font-size:20px">' + n + '</span>' + wxIcon(j.code, true, 24) + '<span style="font-size:13px;font-weight:600">' + (j.tmax != null ? esc(j.tmax) + '°' : '--°') + '</span><span style="font-size:11px;color:var(--mute)">' + (j.tmin != null ? esc(j.tmin) + '°' : '') + '</span></div>';
   }
   var f = focus || m.now || {};
   return header('AG 2027', 'Météo') + dbNote() +
-    '<section class="sec"><div class="card hl" style="padding:22px;border-radius:24px"><div class="row" style="justify-content:space-between;align-items:flex-start"><div style="display:flex;flex-direction:column;gap:4px"><span class="small">' + (focus ? (todayN ? 'Aujourd\'hui' : 'Ven. 22 janv.') : (m.now ? 'Maintenant' : 'Ven. 22 janv.')) + (m.lieu ? ' · ' + esc(m.lieu) : '') + '</span><span class="big" style="font-size:76px">' + (f.tmax != null ? esc(f.tmax) + '°' : '--°') + '</span><span style="color:var(--gold2);font-size:14px">' + esc(f.ciel || 'Prévision à venir') + '</span></div>' + ic('meteo', 84, '#E9C977', 1.1) + '</div>' +
+    '<section class="sec"><div class="card hl" style="padding:22px;border-radius:24px"><div class="row" style="justify-content:space-between;align-items:flex-start"><div style="display:flex;flex-direction:column;gap:4px"><span class="small">' + (focus ? (todayN ? 'Aujourd\'hui' : 'Ven. 22 janv.') : (m.now ? 'Maintenant' : 'Ven. 22 janv.')) + (m.lieu ? ' · ' + esc(m.lieu) : '') + '</span><span class="big" style="font-size:76px">' + (f.tmax != null ? esc(f.tmax) + '°' : '--°') + '</span><span style="color:var(--gold2);font-size:14px">' + esc(f.ciel || 'Prévision à venir') + '</span></div>' + (f.code != null ? wxIcon(f.code, f.isDay !== false, 84) : ic('cloud', 84, '#9FAAC4', 1.1)) + '</div>' +
     '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;border-top:1px solid rgba(212,175,90,.2);padding-top:14px"><div><div class="small" style="text-transform:uppercase">Vent</div><div style="font-weight:600">' + (f.vent != null ? esc(f.vent) + ' km/h' : '--') + '</div></div><div><div class="small" style="text-transform:uppercase">Pluie</div><div style="font-weight:600">' + (f.pluie != null ? esc(f.pluie) + ' %' : '--') + '</div></div><div><div class="small" style="text-transform:uppercase">' + (f.tmin != null ? 'Min.' : 'UV') + '</div><div style="font-weight:600">' + (f.tmin != null ? esc(f.tmin) + '°' : (f.uv != null ? esc(f.uv) : '--')) + '</div></div></div></div></section>' +
     '<section class="sec"><h2 class="script">Le séjour, jour par jour</h2><div class="hscroll">' + strip + '</div><p class="small" style="margin:0">' + (m.hasTrip ? 'Prévisions Open-Meteo pour Anahita, mises à jour automatiquement.' : 'Les prévisions du séjour apparaîtront automatiquement environ 15 jours avant le départ.') + '</p></section>';
 }
@@ -484,6 +484,25 @@ function renderLayer() {
   if (S.sheet) { var f = L.querySelector('[data-autofocus]'); if (f) setTimeout(function () { try { f.focus(); } catch (e) {} }, 30); }
 }
 
+function wxIcon(code, day, size) {
+  var s = size || 24, sw = s > 40 ? 1.1 : 1.6, gold = '#E9C977', grey = '#C9D0E0', blue = '#7FA8E8';
+  var sun = '<circle cx="12" cy="12" r="4" stroke="' + gold + '"/><path stroke="' + gold + '" d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+  var moon = '<path stroke="' + gold + '" d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>';
+  var smallSun = '<circle cx="8" cy="8" r="3" stroke="' + gold + '"/><path stroke="' + gold + '" d="M8 2.5v1M2.5 8h1M4.1 4.1l.7.7M11.9 4.1l-.7.7"/>';
+  var smallMoon = '<path stroke="' + gold + '" d="M11 9.5A4.5 4.5 0 1 1 5.5 4a3.5 3.5 0 0 0 5.5 5.5z"/>';
+  var cloud = function (y) { return '<path stroke="' + grey + '" d="M7 ' + (17 + (y || 0)) + 'h10a4 4 0 0 0 0-8 6 6 0 0 0-11.5 1.5A3.3 3.3 0 0 0 7 ' + (17 + (y || 0)) + 'z"/>'; };
+  var drops = function (n) { var o = ''; for (var i = 0; i < n; i++) o += '<path stroke="' + blue + '" d="M' + (8 + i * 4) + ' 19l-1 3"/>'; return o; };
+  var g;
+  if (code === 0) g = day ? sun : moon;
+  else if (code === 1 || code === 2) g = (day ? smallSun : smallMoon) + '<path stroke="' + grey + '" d="M9 19h8a3.5 3.5 0 0 0 0-7 5 5 0 0 0-9.6 1.4A2.8 2.8 0 0 0 9 19z"/>';
+  else if (code === 3) g = cloud(0);
+  else if (code === 45 || code === 48) g = '<path stroke="' + grey + '" d="M4 9h16M3 13h18M5 17h14"/>';
+  else if (code >= 51 && code <= 57) g = cloud(-3) + '<path stroke="' + blue + '" d="M9 18v1M13 19v1M17 18v1"/>';
+  else if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) g = cloud(-3) + drops(code === 65 || code === 82 ? 3 : 2);
+  else if (code >= 95) g = cloud(-3) + '<path stroke="' + gold + '" d="M13 15l-2.5 4h3L11 23"/>';
+  else g = cloud(0);
+  return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke-width="' + sw + '" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="' + esc(WMO[code] || 'Météo') + '">' + g + '</svg>';
+}
 function parisTime() {
   try { return new Date().toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
 }
@@ -836,16 +855,16 @@ function loadJson(name, key) {
 }
 var WMO = { 0: 'Ensoleillé', 1: 'Plutôt ensoleillé', 2: 'Partiellement nuageux', 3: 'Couvert', 45: 'Brouillard', 48: 'Brouillard', 51: 'Bruine', 53: 'Bruine', 55: 'Bruine', 61: 'Pluie faible', 63: 'Pluie', 65: 'Forte pluie', 80: 'Averses', 81: 'Averses', 82: 'Fortes averses', 95: 'Orages', 96: 'Orages', 99: 'Orages' };
 function loadWeather() {
-  var u = 'https://api.open-meteo.com/v1/forecast?latitude=-20.27&longitude=57.76&current=temperature_2m,weather_code,wind_speed_10m,precipitation_probability,uv_index&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,wind_speed_10m_max&timezone=Indian%2FMauritius&forecast_days=16';
+  var u = 'https://api.open-meteo.com/v1/forecast?latitude=-20.27&longitude=57.76&current=temperature_2m,weather_code,wind_speed_10m,precipitation_probability,uv_index,is_day&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,wind_speed_10m_max&timezone=Indian%2FMauritius&forecast_days=16';
   fetch(u).then(function (r) { return r.json(); }).then(function (d) {
     var m = { lieu: 'Anahita', jours: {}, hasTrip: false };
-    if (d.current) m.now = { tmax: Math.round(d.current.temperature_2m), ciel: WMO[d.current.weather_code] || '', vent: Math.round(d.current.wind_speed_10m), pluie: d.current.precipitation_probability, uv: d.current.uv_index != null ? Math.round(d.current.uv_index) : null };
+    if (d.current) m.now = { code: d.current.weather_code, isDay: d.current.is_day !== 0, tmax: Math.round(d.current.temperature_2m), ciel: WMO[d.current.weather_code] || '', vent: Math.round(d.current.wind_speed_10m), pluie: d.current.precipitation_probability, uv: d.current.uv_index != null ? Math.round(d.current.uv_index) : null };
     var dd = d.daily || {};
     (dd.time || []).forEach(function (day, i) {
       var p = day.split('-');
       if (p[0] === '2027' && p[1] === '01' && +p[2] >= 22 && +p[2] <= 31) {
         m.hasTrip = true;
-        m.jours[String(+p[2])] = { tmax: Math.round(dd.temperature_2m_max[i]), tmin: Math.round(dd.temperature_2m_min[i]), ciel: WMO[dd.weather_code[i]] || '', pluie: dd.precipitation_probability_max[i], vent: Math.round(dd.wind_speed_10m_max[i]) };
+        m.jours[String(+p[2])] = { code: dd.weather_code[i], tmax: Math.round(dd.temperature_2m_max[i]), tmin: Math.round(dd.temperature_2m_min[i]), ciel: WMO[dd.weather_code[i]] || '', pluie: dd.precipitation_probability_max[i], vent: Math.round(dd.wind_speed_10m_max[i]) };
       }
     });
     S.meteo = m; render();
