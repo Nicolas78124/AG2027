@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AG 2027 · Île Maurice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Great+Vibes&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A1630;--card:#12224A;--card2:#1A2C58;--chip:#1B2F5E;--nav:#081126;
+  --gold:#D4AF5A;--gold2:#E9C977;--ink:#F5EEDC;--mute:#9FAAC4;--soft:#C9D0E0;
+  --line:rgba(212,175,90,.3);--blue:#1F3E7A;--red:#6E2430;--pos:#8FD3A8;--neg:#F2A3AC;
+  --serif:'Cormorant Garamond',Georgia,serif;--script:'Great Vibes',cursive;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{min-height:100vh}
+a{color:var(--gold2);text-decoration:none}
+button{font-family:inherit;cursor:pointer;color:inherit}
+button:disabled{opacity:.4;cursor:default}
+input,select,textarea{font-family:inherit;font-size:16px}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.app{max-width:560px;margin:0 auto;padding-top:env(safe-area-inset-top);padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+.head{display:flex;align-items:center;gap:12px;padding:20px 20px 6px}
+.head img{width:52px;height:52px;display:block}
+.kicker{font-size:11px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;font-weight:600}
+h1{margin:0;font-family:var(--serif);font-size:34px;font-weight:700;line-height:1.05}
+h2.script{margin:0;font-family:var(--script);font-weight:400;font-size:34px;color:var(--gold2)}
+.sec{margin:18px 20px 0;display:flex;flex-direction:column;gap:10px}
+.card{padding:18px;border-radius:20px;background:var(--card);display:flex;flex-direction:column;gap:12px}
+.card.hl{border:1px solid var(--line)}
+.card.gold{background:var(--card2);border:1px solid var(--gold)}
+.lbl{font-size:12px;color:var(--gold);text-transform:uppercase;letter-spacing:2px;font-weight:600}
+.small{font-size:12px;color:var(--mute);line-height:1.5}
+.mute{color:var(--mute)}
+.big{font-family:var(--serif);font-weight:700;line-height:1}
+.row{display:flex;align-items:center;gap:12px}
+.grow{flex:1;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.btn{min-height:50px;border-radius:16px;border:0;background:var(--gold);color:var(--bg);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px}
+.btn.ghost{background:transparent;border:1px solid var(--gold);color:var(--gold2);font-weight:600}
+.pill{min-height:38px;padding:0 14px;border-radius:999px;border:1px solid rgba(212,175,90,.45);background:transparent;color:var(--ink);font-size:13px;font-weight:600;flex-shrink:0}
+.pill.on{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+.av{width:44px;height:44px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);background:var(--chip);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:18px;color:var(--ink);flex-shrink:0}
+.note{margin:12px 20px 0;padding:12px 14px;border-radius:14px;background:#2A2440;border:1px solid rgba(212,175,90,.4);font-size:13px;line-height:1.5;color:var(--soft)}
+/* nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--nav);border-top:1px solid var(--line);padding:6px 4px calc(10px + env(safe-area-inset-bottom))}
+nav.tabs .in{max-width:560px;margin:0 auto;display:flex}
+nav.tabs a{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;min-height:48px;color:var(--mute);font-size:11px;font-weight:500}
+nav.tabs a.on{color:var(--gold2)}
+/* home */
+.hero{display:flex;flex-direction:column;align-items:center;padding:26px 24px 4px;gap:12px}
+.hero img{width:min(240px,62vw);height:auto;display:block}
+.tile{display:flex;flex-direction:column;gap:10px;padding:18px 16px;border-radius:18px;background:var(--card);border:1px solid rgba(212,175,90,.28);color:var(--ink)}
+.tile .t{font-family:var(--serif);font-size:24px;font-weight:700}
+.tile .d{font-size:13px;color:var(--mute);line-height:1.4}
+.player{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;padding:4px;min-width:56px}
+.player .av{width:56px;height:56px;font-size:22px}
+.player.me .av{background:var(--gold);color:var(--bg)}
+/* lists */
+.line{display:flex;gap:14px;align-items:stretch}
+.line .dnum{width:46px;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.line .dbody{flex:1;padding:8px 0 10px;border-bottom:1px solid rgba(159,170,196,.15);display:flex;flex-direction:column;gap:2px;white-space:pre-line}
+.kv{padding:14px;border-radius:16px;background:var(--card);display:flex;flex-direction:column;gap:4px}
+.kv>span:first-child{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:1px}
+.kv>span:nth-child(2){font-size:16px;font-weight:600}
+.hscroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+.wday{flex:0 0 64px;padding:12px 0;border-radius:16px;background:var(--card);border:1px solid rgba(212,175,90,.25);display:flex;flex-direction:column;align-items:center;gap:5px}
+.wday.today{border-color:var(--gold);background:var(--card2)}
+/* golf */
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:4px;border-radius:14px;background:var(--card);margin:14px 20px 0}
+.seg button{min-height:42px;border:0;border-radius:10px;background:transparent;color:var(--soft);font-size:13px;font-weight:600}
+.seg button.on{background:var(--gold);color:var(--bg)}
+.rank{display:flex;flex-direction:column;border-radius:16px;background:var(--card);border:1px solid transparent;overflow:hidden}
+.rank.first{background:var(--card2);border-color:var(--gold)}
+.rank>button{display:flex;align-items:center;gap:12px;padding:12px 14px;background:none;border:0;text-align:left;width:100%}
+.dots{display:flex;gap:4px}
+.dots span{width:18px;height:5px;border-radius:3px;background:rgba(159,170,196,.25)}
+.dots span.b{background:#5B8DEF}.dots span.r{background:#E06C7A}
+.rdet{padding:0 14px 14px;display:flex;flex-direction:column;font-size:12px}
+.rdet .rr{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;width:100%;background:none;border:0;border-bottom:1px solid rgba(159,170,196,.12);padding:0;color:var(--ink);font-size:12px;min-height:40px;align-items:center}
+.rdet button.rr:active{background:rgba(212,175,90,.12)}
+.rdet .rr>span{padding:5px 2px;text-align:center}
+.rdet .h{color:var(--mute);font-size:10px;text-transform:uppercase;min-height:28px}
+.sc{width:100%;border-collapse:collapse;font-size:14px}
+.sc th{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:1px;font-weight:600;padding:8px 4px;border-bottom:1px solid rgba(212,175,90,.3)}
+.sc td{padding:8px 4px;text-align:center;border-bottom:1px solid rgba(159,170,196,.12)}
+.sc tr.sub td{background:rgba(212,175,90,.08);font-weight:700;color:var(--gold2)}
+.sc tr.tot td{background:var(--card2);font-weight:700;font-size:15px;color:var(--gold2);border-bottom:0}
+.sc .u{display:inline-flex;min-width:28px;height:28px;align-items:center;justify-content:center;border-radius:50%}
+.sc .u.bd{border:1.5px solid var(--gold2);color:var(--gold2)}
+.sc .u.bg{border:1px solid rgba(159,170,196,.5);border-radius:6px}
+.team{padding:10px 12px;border-radius:12px;display:flex;flex-direction:column;gap:3px;font-size:14px}
+.team .k{font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.85}
+/* budget */
+.tr{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:16px;background:var(--card)}
+.bal{display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;font-size:13px;padding:7px 0}
+.bal span:not(:first-child){text-align:right}
+.bal.h{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:1px;padding-bottom:8px;border-bottom:1px solid rgba(212,175,90,.2)}
+.fab{width:62px;height:62px;border-radius:50%;border:0;background:var(--gold);color:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sw{position:relative;border-radius:16px;overflow:hidden;background:var(--card)}
+.sw .back{position:absolute;top:0;bottom:0;width:120px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:600;opacity:0}
+.sw .back.del{right:0;color:#fff}.sw .back.edit{left:0;color:var(--bg)}
+.sw .front{position:relative;padding:12px 14px;background:var(--card);display:flex;align-items:center;gap:12px;touch-action:pan-y;user-select:none;-webkit-user-select:none;transition:transform .2s ease}
+/* overlays */
+.ov{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+.ov .in{max-width:560px;margin:0 auto;padding-bottom:30px}
+.modal{position:fixed;inset:0;z-index:60;background:rgba(4,9,22,.75);display:flex;align-items:center;justify-content:center;padding:24px}
+.modal .box{width:100%;max-width:420px;padding:24px;border-radius:22px;background:var(--card);border:1px solid var(--gold);display:flex;flex-direction:column;gap:14px}
+.prog{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:8px 20px 0}
+.prog span{height:4px;border-radius:2px;background:rgba(159,170,196,.25)}
+.prog span.on{background:var(--gold)}
+.field{min-height:52px;border-radius:14px;border:1px solid rgba(212,175,90,.45);background:var(--bg);color:var(--ink);padding:0 14px;width:100%;color-scheme:dark}
+.amt{display:flex;align-items:baseline;gap:8px;border-bottom:2px solid var(--gold);padding-bottom:6px}
+.amt input{flex:1;min-width:0;border:0;background:transparent;color:var(--gold2);font-family:var(--serif);font-size:56px;font-weight:700;padding:0}
+.amt input:focus{outline:none}
+.qt{font-family:var(--serif);font-size:28px;font-weight:700}
+.opt{min-height:54px;border-radius:14px;border:1px solid rgba(212,175,90,.45);background:transparent;color:var(--ink);font-size:16px;font-weight:600}
+.opt.on{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+/* médias */
+.mgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.mgrid button{aspect-ratio:1;border:0;padding:0;border-radius:10px;overflow:hidden;background:var(--card);position:relative}
+.mgrid img,.mgrid video{width:100%;height:100%;object-fit:cover;display:block}
+.mgrid .play{position:absolute;left:6px;bottom:6px}
+.potd{border-radius:24px;overflow:hidden;background:var(--card);border:1px solid var(--line);position:relative;min-height:200px;display:flex;align-items:flex-end}
+.potd img,.potd video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.potd .cap{position:relative;width:100%;padding:16px;background:linear-gradient(transparent,rgba(4,9,22,.85))}
+.lb{position:fixed;inset:0;z-index:50;background:rgba(2,6,16,.96);display:flex;flex-direction:column}
+.lb .top{display:flex;justify-content:space-between;align-items:center;padding:calc(10px + env(safe-area-inset-top)) 14px 10px}
+.lb .media{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.lb img,.lb video{max-width:100%;max-height:100%;object-fit:contain}
+.icon-btn{width:44px;height:44px;border-radius:50%;border:0;background:var(--card);color:var(--ink);display:flex;align-items:center;justify-content:center}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:70;background:var(--card2);border:1px solid var(--gold);color:var(--ink);padding:10px 16px;border-radius:12px;font-size:14px;max-width:90vw}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div id="gate" hidden style="position:fixed;inset:0;z-index:100;background:var(--bg);overflow-y:auto"></div>
+<div class="app" id="app"></div>
+
+<nav class="tabs" aria-label="Rubriques"><div class="in" id="tabs"></div></nav>
+<div id="layer"></div>
+<div id="toast" class="toast" hidden role="status"></div>
+
+<script>
+(function () {
+'use strict';
+var NAMES = ['Vic', 'Nico', 'Jef', 'JC', 'Sam'];
+var START = new Date(2027, 0, 22), END = new Date(2027, 0, 31);
+var TEAMS = [
+  ['Jef, JC, Sam', 'Vic, Nico'], ['Vic, Nico, Sam', 'Jef, JC'], ['Nico, Jef, JC', 'Vic, Sam'],
+  ['Vic, JC, Sam', 'Nico, Jef'], ['Vic, Nico, Jef', 'JC, Sam'], ['Nico, JC, Sam', 'Vic, Jef']
+];
+var TEAM_OF = TEAMS.map(function (t) { var m = {}; t[0].split(', ').forEach(function (n) { m[n] = 'b'; }); t[1].split(', ').forEach(function (n) { m[n] = 'r'; }); return m; });
+var DOWS = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'];
+var GOLF_DAYS = [24, 25, 26, 27, 28, 29];
+function golfLabel(k) { var d = new Date(2027, 0, GOLF_DAYS[k]); var s = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }); return s.charAt(0).toUpperCase() + s.slice(1); }
+
+var IC = {
+  home: '<path d="M3 11 12 4l9 7v9h-6v-6H9v6H3z"/>',
+  voyage: '<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>',
+  meteo: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  golf: '<path d="M8 21V3l9 4-9 4"/><ellipse cx="12" cy="21" rx="8" ry="1.5"/>',
+  budget: '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 15h2"/>',
+  medias: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  hotel: '<path d="M3 21h18M5 21V8l7-4 7 4v13M9 21v-5h6v5"/>',
+  chev: '<path d="m9 6 6 6-6 6"/>', back: '<path d="m15 6-6 6 6 6"/>', x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>', list: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  arrow: '<path d="M4 12h15M14 7l5 5-5 5"/>', trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  up: '<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>', cloud: '<path d="M7 18h10a4 4 0 0 0 0-8 6 6 0 0 0-11.5 1.5A3.3 3.3 0 0 0 7 18z"/>',
+  down: '<path d="M12 4v11M7 10l5 5 5-5M4 20h16"/>',
+  cam: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'
+};
+function ic(name, size, color, sw) {
+  return '<svg width="' + (size || 22) + '" height="' + (size || 22) + '" viewBox="0 0 24 24" fill="none" stroke="' + (color || 'currentColor') + '" stroke-width="' + (sw || 1.7) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + IC[name] + '</svg>';
+}
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function eur(c) { return (c / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+function iso(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function today0() { var n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
+function fmtDate(s) { var p = String(s).split('-'); var d = new Date(+p[0], +p[1] - 1, +p[2]); return isNaN(d) ? s : d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' }); }
+function parseAmount(s) { var v = parseFloat(String(s || '').replace(/\s/g, '').replace(',', '.')); return isNaN(v) ? 0 : Math.round(v * 100); }
+function fnum(v) { return v == null ? '—' : esc(String(v).replace('.', ',')); }
+function ini(n) { return n.slice(0, 2).toUpperCase(); }
+var CONTACTS = {};
+var DOSSIER = '';
+var PHOTOS = { Nico: 'nico.jpg', Vic: 'vic.jpg', JC: 'jc.jpg', Jef: 'jef.jpg', Sam: 'sam.jpg' };
+function avInner(n) { return PHOTOS[n] ? '<img src="' + PHOTOS[n] + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">' : esc(ini(n)); }
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function toast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(function () { t.hidden = true; }, 3200); }
+
+var S = {
+  view: 'accueil', golfTab: 'rank', golfOpen: null, mediaFilter: 'all',
+  me: '',
+  db: null, assets: null, dbState: 'loading', readOnly: false,
+  expenses: [], golf: null, voyage: null, meteo: null, medias: [],
+  sheet: null, detail: false, trash: false, confirm: null, lightbox: null, expTrash: [], medTrash: []
+};
+
+/* ---------- writes ---------- */
+function onWriteError(e) {
+  if (e && e.code === 'invalid_argument') { S.readOnly = true; toast("Accès refusé : vérifie le code d'accès."); render(); }
+  else if (e && e.code === 'quota_exceeded') toast('Espace de stockage plein.');
+  else toast("L'enregistrement a échoué, réessaie dans un instant.");
+}
+
+/* ---------- views ---------- */
+function header(kicker, title) {
+  return '<header class="head"><a href="#accueil" aria-label="Retour à l\'accueil"><img src="logo-sm.png" alt=""></a><div><div class="kicker">' + kicker + '</div><h1>' + title + '</h1></div></header>';
+}
+function dbNote() {
+  if (S.dbState === 'off') return '<div class="note">Les données du groupe ne sont pas joignables pour le moment. Vérifie ta connexion.</div>';
+  if (S.dbState === 'slow') return '<div class="note">Les données du groupe ne sont pas encore joignables. Elles s\'afficheront dès que possible.</div>';
+  if (S.readOnly) return '<div class="note">Accès refusé par le serveur : le code d\'accès a peut-être changé. Recharge la page et saisis le nouveau code.</div>';
+  return '';
+}
+
+function vAccueil() {
+  var d = Math.round((START - today0()) / 86400000);
+  var count = '';
+  if (d > 0) count = '<section class="sec"><div class="card hl" style="flex-direction:row;align-items:center;justify-content:space-between;padding:20px;border-radius:22px"><div style="display:flex;flex-direction:column;gap:4px"><span class="small" style="text-transform:uppercase;letter-spacing:2px">Départ dans</span><span class="big" style="font-size:52px;color:var(--gold2)">' + d + ' <span style="font-size:24px">' + (d > 1 ? 'jours' : 'jour') + '</span></span></div><div style="display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:2px"><span style="font-family:var(--serif);font-size:22px;font-weight:600">22 → 31 janv.</span><span class="small">2027 · 9 nuits</span></div></div></section>';
+  else if (d === 0) count = '<section class="sec"><div class="card gold" style="align-items:center;text-align:center;padding:26px 20px;border-radius:22px;gap:6px"><span class="big" style="font-size:76px;color:var(--gold2)">Jour J</span><span>Cap sur l\'île Maurice !</span></div></section>';
+  var players = NAMES.map(function (n) {
+    return '<button type="button" class="player" data-person="' + n + '" aria-label="Contacter ' + esc(CONTACTS[n] ? CONTACTS[n].nom : n) + '"><span class="av">' + avInner(n) + '</span><span style="font-size:13px">' + n + '</span></button>';
+  }).join('');
+  function tile(href, icon, t, desc, wide) {
+    return '<a class="tile" href="#' + href + '"' + (wide ? ' style="grid-column:span 2;flex-direction:row;align-items:center;gap:16px;background:var(--card2);border-color:var(--gold)"' : '') + '>' + ic(icon, wide ? 34 : 26, '#E9C977', 1.6) + (wide ? '<div class="grow" style="display:flex;flex-direction:column;gap:4px">' : '') + '<span class="t">' + t + '</span><span class="d">' + desc + '</span>' + (wide ? '</div>' + ic('chev', 20, '#E9C977', 2) : '') + '</a>';
+  }
+  return '<header class="hero"><img src="logo.png" alt="Logo AG 2027 Île Maurice"><p style="margin:0;font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);font-weight:600">Golf · Amis · Océan Indien</p></header>' +
+    dbNote() + count +
+    '<section class="sec"><h2 class="script">La bande</h2><div style="display:flex;justify-content:space-between">' + players + '</div></section>' +
+    '<section class="sec grid2" style="display:grid">' +
+    tile('voyage', 'voyage', 'Voyage', 'Vols, hébergement, jour par jour') +
+    tile('meteo', 'meteo', 'Météo', 'Prévisions du séjour') +
+    tile('golf', 'golf', 'Golf', 'Classement général, équipes du jour', true) +
+    tile('budget', 'budget', 'Budget', 'Dépenses et qui doit quoi') +
+    tile('medias', 'medias', 'Médias', 'Photos et vidéos du groupe') +
+    '</section><p style="margin:28px 0 8px;text-align:center;font-family:var(--script);font-size:30px;color:var(--gold)">Île Maurice</p>';
+}
+
+function vVoyage() {
+  var v = S.voyage || {};
+  var al = v.aller || {}, re = v.retour || {}, h = v.hotel || {}, jours = v.jours || {};
+  function leg(t, l) {
+    return '<div class="row" style="justify-content:space-between"><div style="display:flex;flex-direction:column;gap:2px"><span class="small">' + t + '</span><span class="big" style="font-size:30px">' + esc(l.de || '—') + '</span><span class="small">' + esc(l.heureDepart || '') + '</span></div>' +
+      '<div class="grow row" style="gap:6px;padding:0 10px"><div class="grow" style="border-top:1px dashed var(--gold)"></div>' + ic('voyage', 20, '#E9C977', 1.6) + '<div class="grow" style="border-top:1px dashed var(--gold)"></div></div>' +
+      '<div style="display:flex;flex-direction:column;gap:2px;align-items:flex-end"><span class="small">' + esc(l.vol || '') + '</span><span class="big" style="font-size:30px">' + esc(l.vers || '—') + '</span><span class="small">' + esc(l.heureArrivee || '') + '</span></div></div>';
+  }
+  var days = '';
+  for (var n = 22; n <= 31; n++) {
+    var dt = new Date(2027, 0, n);
+    var title = n === 22 ? 'Départ' : (n === 31 ? 'Retour' : 'Jour ' + (n - 21));
+    var j = jours[String(n)];
+    var t2 = j && j.titre ? j.titre : title;
+    var txt = j && j.texte ? j.texte : 'À venir';
+    var isToday = iso(dt) === iso(today0());
+    days += '<div class="line"><div class="dnum"><span class="big" style="font-size:22px;color:var(--gold2)">' + n + '</span><span style="font-size:10px;color:var(--mute);text-transform:uppercase">' + DOWS[dt.getDay()] + '</span></div><div class="dbody"' + (isToday ? ' style="border-bottom-color:var(--gold)"' : '') + '><span style="font-size:14px;font-weight:600">' + esc(t2) + (isToday ? ' · <span style="color:var(--gold2)">aujourd\'hui</span>' : '') + '</span><span style="font-size:13px;color:' + (j && j.texte ? 'var(--soft)' : 'var(--mute)') + '">' + esc(txt) + '</span></div></div>';
+  }
+  return header('AG 2027', 'Le voyage') + dbNote() +
+    '<section class="sec"><div class="card hl">' + leg('Aller · ' + (al.date || 'ven. 22 janv.'), { de: al.de || 'PAR', vers: al.vers || 'MRU', vol: al.vol, heureDepart: al.heureDepart, heureArrivee: al.heureArrivee }) +
+    '<div style="border-top:1px solid rgba(212,175,90,.2)"></div>' + leg('Retour · ' + (re.date || 'dim. 31 janv.'), { de: re.de || 'MRU', vers: re.vers || 'PAR', vol: re.vol, heureDepart: re.heureDepart, heureArrivee: re.heureArrivee }) + '</div></section>' +
+    '<section class="sec" style="gap:4px"><h2 class="script" style="margin-bottom:8px">Jour par jour</h2>' + days + '</section>' +
+    '<section class="sec grid2" style="display:grid"><div class="kv"><span>Décalage</span><span>Paris <span class="paris-time">' + parisTime() + '</span></span><span style="font-size:11px;color:var(--mute);text-transform:none;letter-spacing:0;font-weight:400">Maurice = Paris + 3 h</span></div><button type="button" class="kv" data-act="openConv" style="border:0;text-align:left;color:inherit;font:inherit;cursor:pointer;border:1px solid rgba(212,175,90,.35);position:relative"><span>Roupie (MUR)</span><span>' + (S.change && S.change.taux ? '500 Rs ≈ ' + (500 / S.change.taux).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : 'Roupie (MUR)') + '</span>' + (S.change && S.change.taux ? '<span style="font-size:11px;color:var(--mute);text-transform:none;letter-spacing:0;font-weight:400">1 € = ' + String(S.change.taux).replace('.', ',') + ' Rs' + (S.change.date ? ' · ' + esc(fmtDate(S.change.date)) : '') + '</span>' : '') + '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E9C977" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position:absolute;top:12px;right:12px"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="8" y="5.5" width="8" height="4" rx=".5"/><path d="M8.5 13h.01M12 13h.01M15.5 13h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg></button><button type="button" class="kv" data-act="openAgent" style="text-align:left;color:inherit;font:inherit;cursor:pointer;border:1px solid rgba(212,175,90,.35);position:relative"><span>Voyagiste</span><span style="padding-right:22px">Golf Autour du Monde</span><span style="font-size:11px;color:var(--mute);text-transform:none;letter-spacing:0;font-weight:400">Contacts et forfait</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E9C977" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position:absolute;top:12px;right:12px"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.8 2z"/></svg></button><button type="button" class="kv" data-act="openPlug" style="text-align:left;color:inherit;font:inherit;cursor:pointer;border:1px solid rgba(212,175,90,.35);position:relative"><span>Prises</span><span>Type C / G</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E9C977" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position:absolute;top:12px;right:12px"><path d="M9 2v5M15 2v5M6 7h12v4a6 6 0 0 1-12 0zM12 17v5"/></svg></button></section>';
+}
+
+function vMeteo() {
+  var m = S.meteo || {}, jours = m.jours || {};
+  var tk = iso(today0());
+  var todayN = (today0() >= START && today0() <= END) ? today0().getDate() : null;
+  var focus = jours[String(todayN || 22)];
+  var strip = '';
+  for (var n = 22; n <= 31; n++) {
+    var dt = new Date(2027, 0, n), j = jours[String(n)] || {};
+    strip += '<div class="wday' + (todayN === n ? ' today' : '') + '"><span style="font-size:11px;color:var(--mute);text-transform:uppercase">' + DOWS[dt.getDay()] + '</span><span class="big" style="font-size:20px">' + n + '</span>' + ic(j.ciel && /sol|clair|ensol/i.test(j.ciel) ? 'meteo' : 'cloud', 22, '#9FAAC4', 1.5) + '<span style="font-size:13px;font-weight:600">' + (j.tmax != null ? esc(j.tmax) + '°' : '--°') + '</span><span style="font-size:11px;color:var(--mute)">' + (j.tmin != null ? esc(j.tmin) + '°' : '') + '</span></div>';
+  }
+  var f = focus || m.now || {};
+  return header('AG 2027', 'Météo') + dbNote() +
+    '<section class="sec"><div class="card hl" style="padding:22px;border-radius:24px"><div class="row" style="justify-content:space-between;align-items:flex-start"><div style="display:flex;flex-direction:column;gap:4px"><span class="small">' + (focus ? (todayN ? 'Aujourd\'hui' : 'Ven. 22 janv.') : (m.now ? 'Maintenant' : 'Ven. 22 janv.')) + (m.lieu ? ' · ' + esc(m.lieu) : '') + '</span><span class="big" style="font-size:76px">' + (f.tmax != null ? esc(f.tmax) + '°' : '--°') + '</span><span style="color:var(--gold2);font-size:14px">' + esc(f.ciel || 'Prévision à venir') + '</span></div>' + ic('meteo', 84, '#E9C977', 1.1) + '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;border-top:1px solid rgba(212,175,90,.2);padding-top:14px"><div><div class="small" style="text-transform:uppercase">Vent</div><div style="font-weight:600">' + (f.vent != null ? esc(f.vent) + ' km/h' : '--') + '</div></div><div><div class="small" style="text-transform:uppercase">Pluie</div><div style="font-weight:600">' + (f.pluie != null ? esc(f.pluie) + ' %' : '--') + '</div></div><div><div class="small" style="text-transform:uppercase">' + (f.tmin != null ? 'Min.' : 'UV') + '</div><div style="font-weight:600">' + (f.tmin != null ? esc(f.tmin) + '°' : (f.uv != null ? esc(f.uv) : '--')) + '</div></div></div></div></section>' +
+    '<section class="sec"><h2 class="script">Le séjour, jour par jour</h2><div class="hscroll">' + strip + '</div><p class="small" style="margin:0">' + (m.hasTrip ? 'Prévisions Open-Meteo pour Anahita, mises à jour automatiquement.' : 'Les prévisions du séjour apparaîtront automatiquement environ 15 jours avant le départ.') + '</p></section>';
+}
+
+function vGolf() {
+  var g = S.golf || {};
+  var rows = (g.classement || []).slice();
+  var HJ = g.hcpJour || {}, IDX = g.index || {};
+  var hjLabel = g.hcpJourDate ? fmtDate(g.hcpJourDate) : '';
+  var hasData = rows.length > 0;
+  if (!hasData) rows = NAMES.map(function (n) { return { nom: n, total: null, parties: [] }; });
+  rows.sort(function (a, b) { if (a.total == null) return 1; if (b.total == null) return -1; return a.total - b.total; });
+  var segs = [['rank', 'Classement'], ['games', 'Parties'], ['rules', 'Règlement']].map(function (s) {
+    return '<button type="button" data-gtab="' + s[0] + '" class="' + (S.golfTab === s[0] ? 'on' : '') + '">' + s[1] + '</button>';
+  }).join('');
+  var body = '';
+  if (S.golfTab === 'rank') {
+    body = rows.map(function (r, i) {
+      var parts = r.parties || [];
+      var dots = '';
+      for (var k = 0; k < 6; k++) dots += '<span class="' + (parts[k] && parts[k].brut != null ? TEAM_OF[k][r.nom] || '' : '') + '"></span>';
+      var open = S.golfOpen === r.nom;
+      var det = '';
+      if (open) {
+        det = '<div class="rdet"><div class="rr h"><span>Jour</span><span>Brut/hcp</span><span>Net</span><span>Bonus</span><span>Final</span></div>';
+        for (var p = 0; p < 6; p++) {
+          var x = parts[p], prev = p > 0 ? parts[p - 1] : null;
+          var hcpNext = (x && x.hcp != null) ? x.hcp : (p === 0 ? IDX[r.nom] : (prev && prev.brut != null && prev.par != null ? (+prev.brut - +prev.par) : null));
+          var played = x && x.brut != null;
+          if (!played) x = null;
+          det += '<button type="button" class="rr" data-card="' + esc(r.nom) + ':' + p + '" aria-label="Carte de score du ' + GOLF_DAYS[p] + ' janvier"><span style="color:var(--gold2);text-decoration:underline;text-underline-offset:3px">' + GOLF_DAYS[p] + '/01</span>' + (x ? '<span>' + fnum(x.brut) + '/' + fnum(x.hcp) + '</span><span>' + fnum(x.net) + '</span><span>' + (x.bonus ? '−' + fnum(x.bonus) : '—') + '</span><span style="font-weight:600">' + fnum(x.final) + '</span>' : (hcpNext != null ? '<span>—/<span style="color:var(--gold2)">' + esc(String(hcpNext).replace('.', ',')) + '</span></span>' : '<span>—</span>') + '<span>—</span><span>—</span><span>—</span>') + '</button>';
+        }
+        det += '<p class="small" style="margin:8px 0 0">Touche un jour pour voir la carte des 18 trous.</p></div>';
+      }
+      return '<div class="rank' + (i === 0 && hasData ? ' first' : '') + '"><button type="button" data-gopen="' + esc(r.nom) + '" aria-expanded="' + open + '"><span class="big" style="width:22px;font-size:24px;color:var(--gold2);text-align:center">' + (r.total != null ? (i + 1) : '–') + '</span><span class="av" style="width:40px;height:40px;font-size:16px;border-width:1.5px">' + avInner(r.nom) + '</span><span class="grow" style="display:flex;flex-direction:column;gap:6px"><span style="font-size:15px;font-weight:600">' + esc(r.nom) + '</span><span class="dots">' + dots + '</span></span><span style="display:flex;flex-direction:column;align-items:flex-end"><span class="big" style="font-size:24px">' + (r.total != null ? esc(String(r.total).replace('.', ',')) : '—') + '</span><span style="font-size:11px;color:var(--mute)">net cumulé</span></span></button>' + det + '</div>';
+    }).join('') + '<p class="small" style="margin:2px 0 0">' + (g.majLe ? 'Mis à jour le ' + esc(g.majLe) + '. ' : '') + 'Total le plus bas = vainqueur du séjour. Touche un joueur pour le détail. Barres : bleu = équipe Bleue, rose = équipe Rouge.</p>';
+  } else if (S.golfTab === 'games') {
+    body = TEAMS.map(function (t, k) {
+      var res = (g.parties || [])[k];
+      return '<div class="card" style="gap:8px;padding:14px"><div class="row" style="justify-content:space-between"><span style="font-family:var(--serif);font-size:20px;font-weight:700;color:var(--gold2)">' + golfLabel(k) + '</span><span class="small">' + esc(res && res.golf ? res.golf : '') + '</span></div><div class="row" style="gap:8px;align-items:stretch"><div class="team grow" style="background:var(--blue)"><span class="k">Bleue · 3' + (res && res.moyBleue != null ? ' · moy. ' + esc(res.moyBleue) : '') + '</span>' + t[0] + '</div><div class="team grow" style="background:var(--red)"><span class="k">Rouge · 2' + (res && res.moyRouge != null ? ' · moy. ' + esc(res.moyRouge) : '') + '</span>' + t[1] + '</div></div>' + (res && res.gagnant ? '<span class="small">Victoire ' + esc(res.gagnant) + (res.bonus ? ' · bonus ' + esc(res.bonus) : '') + '</span>' : '') + '</div>';
+    }).join('');
+  } else {
+    body = '<div class="card" style="font-size:14px;line-height:1.55;color:#DCE1EC;gap:12px"><p style="margin:0"><strong style="color:var(--gold2)">Handicap évolutif.</strong> Partie 1 à l\'index officiel. Ensuite, le handicap du jour = score brut de la veille − par du parcours.</p><p style="margin:0"><strong style="color:var(--gold2)">Équipes.</strong> Chaque jour, une équipe Bleue de 3 contre une Rouge de 2, selon la rotation de l\'onglet Parties. Chacun fait équipe avec chacun.</p><p style="margin:0"><strong style="color:var(--gold2)">Comparaison.</strong> Les équipes sont comparées sur leur moyenne nette. La plus basse gagne la journée.</p><p style="margin:0"><strong style="color:var(--gold2)">Bonus.</strong> L\'écart de moyenne, arrondi au dixième, est déduit du net de chaque gagnant. Égalité parfaite : pas de bonus.</p><p style="margin:0"><strong style="color:var(--gold2)">Classement.</strong> Somme des 6 scores nets ajustés. Le total le plus bas remporte le séjour.</p></div>';
+  }
+  var td = today0(), nxt = 1, isToday = false;
+  for (var q = 0; q < 6; q++) { var gd = new Date(2027, 0, GOLF_DAYS[q]); if (td.getTime() === gd.getTime()) { nxt = q + 1; isToday = true; break; } if (td < gd) { nxt = q + 1; break; } nxt = 7; }
+  if (g.prochainePartie) nxt = g.prochainePartie;
+  var t = TEAMS[Math.min(5, Math.max(0, nxt - 1))];
+  var day = (nxt > 6 || (g.parties && g.parties.length >= 6)) ? '' :
+    '<section class="sec"><div class="card gold" style="border-radius:22px"><div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--script);font-size:30px;line-height:1.1;color:var(--gold2)">' + (isToday ? 'Partie du jour' : 'Prochaine partie') + '</span><span style="font-size:14px;color:var(--soft)">' + golfLabel(nxt - 1) + '</span></div><div class="grid2"><div class="team" style="background:var(--blue)"><span class="k">Équipe Bleue · 3</span><strong>' + t[0] + '</strong></div><div class="team" style="background:var(--red)"><span class="k">Équipe Rouge · 2</span><strong>' + t[1] + '</strong></div></div><p style="margin:0;display:flex;gap:8px;font-size:13px;line-height:1.45;color:var(--soft)">' + ic('cam', 18, '#E9C977') + 'Classement mis à jour chaque soir à partir des photos des cartes de score.</p></div></section>';
+  return header('Tournoi officiel', 'Golf') + dbNote() + '<div class="seg" role="tablist">' + segs + '</div><section class="sec" style="gap:8px">' + body + '</section>' + day;
+}
+
+function computeBudget() {
+  var paid = {}, owed = {}, total = 0;
+  NAMES.forEach(function (n) { paid[n] = 0; owed[n] = 0; });
+  S.expenses.forEach(function (e) {
+    var shares = (e.shares || []).filter(function (n) { return NAMES.indexOf(n) >= 0; });
+    if (!shares.length || NAMES.indexOf(e.payer) < 0) return;
+    total += e.cents; paid[e.payer] += e.cents;
+    var k = shares.length, base = Math.floor(e.cents / k), rest = e.cents - base * k;
+    shares.forEach(function (n, i) { owed[n] += base + (i < rest ? 1 : 0); });
+  });
+  var bal = NAMES.map(function (n) { return { n: n, paid: paid[n], owed: owed[n], b: paid[n] - owed[n] }; });
+  var cred = bal.filter(function (x) { return x.b > 0; }).map(function (x) { return { n: x.n, v: x.b }; }).sort(function (a, b) { return b.v - a.v; });
+  var debt = bal.filter(function (x) { return x.b < 0; }).map(function (x) { return { n: x.n, v: -x.b }; }).sort(function (a, b) { return b.v - a.v; });
+  var tr = [], i = 0, j = 0;
+  while (i < debt.length && j < cred.length) {
+    var x = Math.min(debt[i].v, cred[j].v);
+    if (x > 0) tr.push({ from: debt[i].n, to: cred[j].n, c: x });
+    debt[i].v -= x; cred[j].v -= x;
+    if (!debt[i].v) i++; if (!cred[j].v) j++;
+  }
+  return { total: total, bal: bal, tr: tr };
+}
+
+function vBudget() {
+  var B = computeBudget();
+  var trs = B.tr.length ? B.tr.map(function (t) {
+    return '<div class="tr"><span style="min-width:44px;font-size:15px;font-weight:600">' + t.from + '</span><span role="img" aria-label="doit à">' + ic('arrow', 22, '#E9C977', 1.8) + '</span><span class="grow" style="font-size:15px;font-weight:600">' + t.to + '</span><span class="big" style="font-size:22px;color:var(--gold2)">' + eur(t.c) + '</span></div>';
+  }).join('') : '<div class="tr" style="color:var(--soft);font-size:14px">Personne ne doit rien à personne.</div>';
+  var bals = '<div class="bal h"><span>Joueur</span><span>A payé</span><span>Sa part</span><span>Solde</span></div>' + B.bal.map(function (x) {
+    return '<div class="bal"><span style="font-weight:600">' + x.n + '</span><span style="color:var(--soft)">' + eur(x.paid) + '</span><span style="color:var(--soft)">' + eur(x.owed) + '</span><span style="font-weight:600;color:' + (x.b > 0 ? 'var(--pos)' : x.b < 0 ? 'var(--neg)' : 'var(--soft)') + '">' + (x.b > 0 ? '+' : '') + eur(x.b) + '</span></div>';
+  }).join('');
+  var n = S.expenses.length;
+  var canAdd = S.db && !S.readOnly;
+  return header('AG 2027', 'Budget') + dbNote() +
+    '<section class="sec"><div class="card hl" style="padding:22px;border-radius:24px"><span class="small" style="text-transform:uppercase;letter-spacing:2px">Dépense totale du groupe</span><span class="big" style="font-size:54px;color:var(--gold2)">' + eur(B.total) + '</span><span class="small">' + n + (n > 1 ? ' dépenses' : ' dépense') + '</span></div></section>' +
+    '<section class="sec"><h2 class="script">Qui doit quoi à qui</h2>' + trs + '</section>' +
+    '<section class="sec"><div class="card" style="gap:2px;padding:16px">' + bals + '</div></section>' +
+    '<section class="sec" style="flex-direction:row;align-items:center;gap:12px;margin-top:22px"><button type="button" class="btn ghost grow" data-act="detail">' + ic('list', 18, 'currentColor', 2) + 'Détail</button><button type="button" class="fab" data-act="add" aria-label="Ajouter une dépense"' + (canAdd ? '' : ' disabled') + '>' + ic('plus', 26, 'currentColor', 2.4) + '</button></section>';
+}
+
+function vMedias() {
+  var list = S.medias.filter(function (m) { return S.mediaFilter === 'all' || (S.mediaFilter === 'video' ? m.kind === 'video' : m.kind !== 'video'); });
+  var latest = S.medias.filter(function (m) { return m.kind !== 'video'; })[0];
+  var potd = latest ? '<img src="' + mediaSrc(latest) + '" alt="">' : '';
+  var chips = [['all', 'Tout'], ['photo', 'Photos'], ['video', 'Vidéos']].map(function (c) {
+    return '<button type="button" class="pill' + (S.mediaFilter === c[0] ? ' on' : '') + '" data-mf="' + c[0] + '">' + c[1] + '</button>';
+  }).join('');
+  var grid = list.length ? list.map(function (m) {
+    var src = mediaSrc(m);
+    return '<button type="button" data-open="' + esc(m.id) + '" aria-label="' + (m.kind === 'video' ? 'Vidéo' : 'Photo') + (m.by ? ' de ' + esc(m.by) : '') + '">' + (m.kind === 'video' ? '<video src="' + src + '#t=0.1" muted playsinline preload="metadata"></video><span class="play"><svg width="18" height="18" viewBox="0 0 24 24" fill="#E9C977" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>' : '<img src="' + src + '" alt="" loading="lazy">') + '</button>';
+  }).join('') : '';
+  var canUp = S.db && !S.readOnly;
+  return header('AG 2027', 'Médias') + dbNote() +
+    '<section class="sec"><div class="potd">' + potd + '<div class="cap">' + (latest ? '' : ic('cam', 36, 'rgba(233,201,119,.6)', 1.3)) + '<div style="font-family:var(--script);font-size:30px;color:var(--gold2)">Photo du jour</div><div class="small" style="color:var(--soft)">' + (latest ? esc((latest.caption ? latest.caption + (latest.by ? ' · ' : '') : '') + (latest.by ? 'par ' + latest.by : '') || fmtDate(latest.date)) : 'La dernière photo partagée s\'affichera ici.') + '</div></div></div></section>' +
+    '<section class="sec"><div class="row" style="gap:8px"><div class="hscroll grow">' + chips + '</div><button type="button" class="pill" data-act="openTrash">Corbeille (' + S.medTrash.length + ')</button></div>' + (grid ? '<div class="mgrid">' + grid + '</div>' : '<div class="card" style="text-align:center;color:var(--soft);font-size:14px">Aucun média pour l\'instant.</div>') + '</section>' +
+    '<section class="sec"><label class="btn" style="cursor:pointer' + (canUp ? '' : ';opacity:.4;pointer-events:none') + '">' + ic('up', 18, 'currentColor', 2.2) + 'Partager des photos ou vidéos<input type="file" id="up" accept="image/*,video/*" multiple hidden' + (canUp ? '' : ' disabled') + '></label>' + '</section>';
+}
+
+/* ---------- overlays ---------- */
+function renderLayer() {
+  var L = document.getElementById('layer'), h = '';
+  if (S.detail) {
+    var rows = S.expenses.slice().sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : (b.createdAt || 0) - (a.createdAt || 0); });
+    h += '<div class="ov" role="dialog" aria-label="Détail des dépenses"><div class="in">' + header('Budget', 'Dépenses') +
+      '<div class="row" style="margin:6px 20px 0;justify-content:space-between"><button type="button" data-act="closeDetail" style="min-height:44px;border:0;background:none;color:var(--gold2);font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px;padding:0">' + ic('back', 18, 'currentColor', 2) + 'Budget</button><button type="button" class="pill" data-act="openTrash">Corbeille (' + S.expTrash.length + ')</button></div><p class="small" style="margin:6px 20px 0">Glisser à gauche pour supprimer, à droite pour corriger.</p>' +
+      '<section class="sec" style="gap:8px;margin-top:8px">' + (rows.length ? rows.map(function (e) {
+        var who = (e.shares || []).length === NAMES.length ? 'tout le monde' : (e.shares || []).join(', ');
+        return '<div class="sw"><div class="back edit">' + ic('list', 18, 'currentColor', 2) + 'Corriger</div><div class="back del">' + ic('trash', 18, '#fff', 2) + 'Supprimer</div><div class="front" data-swipe="' + esc(e.id) + '"><div class="grow" style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600">' + esc(e.label) + '</span><span class="small">' + esc(fmtDate(e.date)) + ' · payé par ' + esc(e.payer) + '</span><span class="small">Pour : ' + esc(who) + '</span></div><span class="big" style="font-size:22px;color:var(--gold2)">' + eur(e.cents) + '</span></div></div>';
+      }).join('') : '<div class="card" style="text-align:center;color:var(--soft);font-size:14px">Aucune dépense pour l\'instant.</div>') + '</section></div></div>';
+  }
+  if (S.trash) {
+    var showExp = S.view === 'budget';
+    var items = showExp ? S.expTrash : S.medTrash;
+    var when = function (x) { return (x.deletedAt ? new Date(x.deletedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '') + (x.deletedBy ? ' par ' + x.deletedBy : ''); };
+    h += '<div class="ov" role="dialog" aria-label="Corbeille"><div class="in">' + header(showExp ? 'Budget' : 'Médias', 'Corbeille') +
+      '<div class="row" style="margin:6px 20px 0"><button type="button" data-act="closeTrash" style="min-height:44px;border:0;background:none;color:var(--gold2);font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px;padding:0">' + ic('back', 18, 'currentColor', 2) + 'Retour</button></div>' +
+      '<section class="sec" style="gap:8px;margin-top:8px">' + (items.length ? items.map(function (x) {
+        var restoreBtn = '<button type="button" class="pill" style="border-color:var(--gold);color:var(--gold2)" data-restore="' + (showExp ? 'expenses' : 'medias') + ':' + esc(x.id) + '">Restaurer</button>';
+        if (showExp) return '<div class="tr" style="gap:12px"><div class="grow" style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600">' + esc(x.label) + ' · ' + eur(x.cents) + '</span><span class="small">' + esc(fmtDate(x.date)) + ' · payé par ' + esc(x.payer) + '</span><span class="small">Supprimée ' + esc(when(x)) + '</span></div>' + restoreBtn + '</div>';
+        var src = mediaSrc(x);
+        return '<div class="tr" style="gap:12px"><div style="width:64px;height:64px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--chip)">' + (x.kind === 'video' ? '<video src="' + src + '#t=0.1" muted playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover"></video>' : '<img src="' + src + '" alt="" style="width:100%;height:100%;object-fit:cover">') + '</div><div class="grow" style="display:flex;flex-direction:column;gap:3px"><span style="font-size:14px;font-weight:600">' + (x.kind === 'video' ? 'Vidéo' : 'Photo') + (x.by ? ' de ' + esc(x.by) : '') + '</span><span class="small">Supprimée ' + esc(when(x)) + '</span></div>' + restoreBtn + '</div>';
+      }).join('') : '<div class="card" style="text-align:center;color:var(--soft);font-size:14px">La corbeille est vide.</div>') + '</section></div></div>';
+  }
+  if (S.sheet) h += sheetHtml();
+  if (S.card) h += scoreCardHtml();
+  if (S.person && CONTACTS[S.person]) {
+    var P = CONTACTS[S.person], num = P.tel.replace(/[^+\d]/g, ''), wa = num.replace('+', '');
+    var act = function (href, label, svg, ext) { return '<a href="' + href + '"' + (ext ? ' target="_blank" rel="noopener"' : '') + ' style="display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--ink);font-size:12px;font-weight:600"><span style="width:58px;height:58px;border-radius:50%;background:var(--gold);color:var(--bg);display:flex;align-items:center;justify-content:center">' + svg + '</span>' + label + '</a>'; };
+    var svgTel = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.8 2z"/></svg>';
+    var svgMail = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
+    var svgWa = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.7 3 .6a2.5 2.5 0 0 0 1.7-1.2 2 2 0 0 0 .1-1.2c0-.1-.2-.2-.4-.3z"/></svg>';
+    h += '<div class="modal" data-act="closePersonBg"><div class="box" role="dialog" aria-labelledby="pst" style="align-items:center;text-align:center;gap:14px;position:relative"><button type="button" class="icon-btn" data-act="closePerson" aria-label="Fermer" style="position:absolute;top:14px;right:14px">' + ic('x', 18, 'currentColor', 2) + '</button>' +
+      '<span class="av" style="width:96px;height:96px;font-size:34px;border-width:3px">' + avInner(S.person) + '</span>' +
+      '<div><div id="pst" style="font-family:var(--serif);font-size:26px;font-weight:700">' + esc(P.nom) + '</div><div class="small" style="font-size:14px;color:var(--gold2)">' + esc(S.person) + '</div></div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;font-size:15px;width:100%">' +
+      '<div class="row" style="justify-content:space-between;gap:8px;padding:8px 12px;border-radius:12px;background:var(--bg)"><span>' + esc(P.tel) + '</span><button type="button" class="pill" data-copy="' + esc(P.tel) + '" style="min-height:34px">Copier</button></div>' +
+      '<div class="row" style="justify-content:space-between;gap:8px;padding:8px 12px;border-radius:12px;background:var(--bg)"><span style="color:var(--soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(P.mail) + '</span><button type="button" class="pill" data-copy="' + esc(P.mail) + '" style="min-height:34px">Copier</button></div></div>' +
+      '<div class="row" style="gap:22px;justify-content:center;margin-top:6px">' + act('tel:' + num, 'Appeler', svgTel) + act('mailto:' + P.mail, 'E-mail', svgMail) + act('https://wa.me/' + wa, 'WhatsApp', svgWa, true) + '</div></div></div>';
+  }
+  if (S.agent) {
+    var li = function (k, v) { return '<div style="display:flex;flex-direction:column;gap:2px;padding:8px 0;border-bottom:1px solid rgba(159,170,196,.12)"><span class="small" style="text-transform:uppercase;letter-spacing:1px;font-size:11px">' + k + '</span><span style="font-size:14px;line-height:1.45">' + v + '</span></div>'; };
+    h += '<div class="modal" data-act="closeAgentBg"><div class="box" role="dialog" aria-labelledby="agt" style="gap:12px;max-height:88vh;overflow-y:auto"><div class="row" style="justify-content:space-between"><span id="agt" style="font-family:var(--serif);font-size:26px;font-weight:700">Voyagiste</span><button type="button" class="icon-btn" data-act="closeAgent" aria-label="Fermer">' + ic('x', 18, 'currentColor', 2) + '</button></div>' +
+      '<div><span style="font-family:var(--serif);font-size:22px;font-weight:700;color:var(--gold2)">Golf Autour du Monde</span><div class="small">Voyages Gallia · organisateur du forfait</div></div>' +
+      '<div class="grid2" style="gap:8px"><a class="btn" href="tel:+33153433636" style="min-height:46px;font-size:14px">Appeler</a><a class="btn ghost" href="mailto:golf@golfautourdumonde.com" style="min-height:46px;font-size:14px">E-mail</a></div>' +
+      '<div>' +
+      li('Téléphone', '+33 1 53 43 36 36') +
+      li('E-mail', 'golf@golfautourdumonde.com') +
+      li('Site', '<a href="https://golf.voyages-gallia.fr/">golf.voyages-gallia.fr</a>') +
+      li('Espace client', '<a href="https://perso.voyages-gallia.fr">perso.voyages-gallia.fr</a> · documents de voyage et paiements') +
+      (DOSSIER ? li('Dossier', esc(DOSSIER)) : '') +
+      '</div>' +
+      '<div class="card" style="background:var(--bg);padding:14px;gap:6px;font-size:13px;line-height:1.5;color:var(--soft)"><span class="lbl" style="font-size:11px">Le forfait comprend</span><span>Vols directs Corsair Orly ↔ Maurice (bagage soute 23 kg et sac de golf gratuit) · taxes aéroport · transferts aéroport · The Bay Club at Anahita, suite 3 chambres vue mer · demi-pension · 1 green fee par jour à Anahita et à l\'Île aux Cerfs (transfert inclus).</span><span><strong style="color:var(--ink)">À régler sur place :</strong> voiturettes, obligatoires sur les deux golfs.</span></div>' +
+      '</div></div>';
+  }
+  if (S.plug) {
+    var col = function (k, title, desc) { return '<div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center"><span style="font-family:var(--serif);font-size:22px;font-weight:700;color:var(--gold2)">Type ' + k + '</span><div class="row" style="gap:6px">' + socketSvg(k) + '</div><div class="row" style="gap:6px">' + plugSvg(k) + '</div><span style="font-size:13px;font-weight:600">' + title + '</span><span class="small">' + desc + '</span></div>'; };
+    h += '<div class="modal" data-act="closePlugBg"><div class="box" role="dialog" aria-labelledby="plt" style="gap:16px;max-height:90vh;overflow-y:auto"><div class="row" style="justify-content:space-between"><span id="plt" style="font-family:var(--serif);font-size:26px;font-weight:700">Prises à Maurice</span><button type="button" class="icon-btn" data-act="closePlug" aria-label="Fermer">' + ic('x', 18, 'currentColor', 2) + '</button></div>' +
+      '<div class="grid2">' + col('G', 'La plus répandue', '3 broches rectangulaires, comme au Royaume-Uni') + col('C', 'Aussi présente', '2 broches rondes, sans terre') + '</div>' +
+      '<div class="card" style="background:var(--bg);padding:14px;gap:6px;font-size:13px;line-height:1.5;color:var(--soft)"><span><strong style="color:var(--gold2)">230 V · 50 Hz</strong> : comme en France, pas besoin de transformateur.</span><span>Les chargeurs plats (2 broches fines) entrent dans une prise de type C. Pour les fiches françaises plus grosses, avec terre, prévoyez un <strong style="color:var(--ink)">adaptateur type G</strong>.</span></div><span class="small" style="text-align:center">En haut : la prise murale · en bas : la fiche qui s\'y branche</span></div></div>';
+  }
+  if (S.conv) {
+    var tx = S.change && S.change.taux ? +S.change.taux : null;
+    h += '<div class="modal" data-act="closeConvBg"><div class="box" role="dialog" aria-labelledby="cvt" style="gap:16px"><div class="row" style="justify-content:space-between"><span id="cvt" style="font-family:var(--serif);font-size:26px;font-weight:700">Convertisseur</span><button type="button" class="icon-btn" data-act="closeConv" aria-label="Fermer">' + ic('x', 18, 'currentColor', 2) + '</button></div>' +
+      (tx ? '<label class="small" for="cv-eur" style="text-transform:uppercase;letter-spacing:1px">Euros</label><div class="amt" style="margin-top:-10px"><input id="cv-eur" data-conv="eur" type="text" inputmode="decimal" placeholder="0" autocomplete="off" style="font-size:44px"><span class="big" style="font-size:30px;color:var(--gold2)">€</span></div>' +
+      '<label class="small" for="cv-mur" style="text-transform:uppercase;letter-spacing:1px">Roupies</label><div class="amt" style="margin-top:-10px"><input id="cv-mur" data-conv="mur" type="text" inputmode="decimal" placeholder="0" autocomplete="off" style="font-size:44px"><span class="big" style="font-size:30px;color:var(--gold2)">Rs</span></div>' +
+      '<div class="row" style="flex-wrap:wrap;gap:8px">' + [100, 500, 1000, 2000, 5000].map(function (v) { return '<button type="button" class="pill" data-quickmur="' + v + '">' + v.toLocaleString('fr-FR') + ' Rs</button>'; }).join('') + '</div>' +
+      '<span class="small">Taux : 1 € = ' + String(tx).replace('.', ',') + ' Rs' + (S.change.date ? ' (' + esc(fmtDate(S.change.date)) + ')' : '') + '. Taux moyen du marché : au change, vous aurez un peu moins.</span>'
+      : '<span style="color:var(--soft)">Le taux du jour n\'est pas encore disponible.</span>') + '</div></div>';
+  }
+  if (S.lightbox) {
+    var m = S.medias.filter(function (x) { return x.id === S.lightbox; })[0];
+    if (m) {
+      var src = mediaSrc(m);
+      h += '<div class="lb" role="dialog" aria-label="Média"><div class="top"><span class="small" style="color:var(--soft)">' + esc((m.caption ? m.caption + ' · ' : '') + (m.by ? 'par ' + m.by : '') + (m.date ? (m.by || m.caption ? ' · ' : '') + fmtDate(m.date) : '')) + '</span><div class="row" style="gap:8px">' + (true ? '<button type="button" class="icon-btn" data-act="dlMedia" aria-label="Télécharger sur mon téléphone">' + ic('down', 18, 'currentColor', 2) + '</button>' : '') + (S.db && !S.readOnly ? '<button type="button" class="icon-btn" data-act="delMedia" aria-label="Supprimer">' + ic('trash', 18) + '</button>' : '') + '<button type="button" class="icon-btn" data-act="closeLb" aria-label="Fermer">' + ic('x', 18, 'currentColor', 2) + '</button></div></div><div class="media">' + (m.kind === 'video' ? '<video src="' + src + '" controls playsinline autoplay></video>' : '<img src="' + src + '" alt="">') + '</div></div>';
+    }
+  }
+  if (S.confirm) {
+    h += '<div class="modal"><div class="box" role="alertdialog" aria-labelledby="cft"><span id="cft" style="font-family:var(--serif);font-size:26px;font-weight:700">' + esc(S.confirm.title) + '</span><span style="font-size:14px;color:var(--soft);line-height:1.5">' + esc(S.confirm.text) + '</span><div class="row" style="gap:10px"><button type="button" class="btn ghost grow" data-act="cfNo">Annuler</button><button type="button" class="btn grow" style="background:#B83A48;color:#fff" data-act="cfYes">Supprimer</button></div></div></div>';
+  }
+  L.innerHTML = h;
+  document.body.style.overflow = (S.detail || S.trash || S.sheet || S.lightbox || S.card || S.conv || S.plug || S.agent || S.person) ? 'hidden' : '';
+  if (S.sheet) { var f = L.querySelector('[data-autofocus]'); if (f) setTimeout(function () { try { f.focus(); } catch (e) {} }, 30); }
+}
+
+function parisTime() {
+  try { return new Date().toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
+}
+setInterval(function () { var v = parisTime(); document.querySelectorAll('.paris-time').forEach(function (el) { if (el.textContent !== v) el.textContent = v; }); }, 15000);
+function socketSvg(kind) {
+  var face = '<rect x="4" y="4" width="112" height="112" rx="22" fill="#F5EEDC" stroke="#D4AF5A" stroke-width="3"/>';
+  var inner = kind === 'C'
+    ? '<circle cx="60" cy="60" r="38" fill="#E6DCC4"/><circle cx="43" cy="60" r="7" fill="#0A1630"/><circle cx="77" cy="60" r="7" fill="#0A1630"/>'
+    : '<rect x="24" y="24" width="72" height="72" rx="10" fill="#E6DCC4"/><rect x="54" y="34" width="12" height="20" rx="2" fill="#0A1630"/><rect x="34" y="68" width="18" height="10" rx="2" fill="#0A1630"/><rect x="68" y="68" width="18" height="10" rx="2" fill="#0A1630"/>';
+  return '<svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="Prise de type ' + kind + '">' + face + inner + '</svg>';
+}
+function plugSvg(kind) {
+  var body = kind === 'C'
+    ? '<path d="M30 20h60l-6 46a24 24 0 0 1-48 0z" fill="#2B3E6E" stroke="#9FAAC4" stroke-width="2"/><rect x="40" y="2" width="6" height="22" rx="3" fill="#C9D0E0"/><rect x="74" y="2" width="6" height="22" rx="3" fill="#C9D0E0"/><rect x="56" y="86" width="8" height="30" fill="#2B3E6E"/>'
+    : '<rect x="22" y="22" width="76" height="62" rx="10" fill="#2B3E6E" stroke="#9FAAC4" stroke-width="2"/><rect x="55" y="2" width="10" height="22" fill="#C9D0E0"/><rect x="33" y="6" width="14" height="18" fill="#C9D0E0"/><rect x="73" y="6" width="14" height="18" fill="#C9D0E0"/><rect x="56" y="84" width="8" height="32" fill="#2B3E6E"/>';
+  return '<svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="Fiche de type ' + kind + '">' + body + '</svg>';
+}
+function strokesOn(hcp, si) {
+  var H = Math.round(+hcp || 0);
+  if (!si) return 0;
+  if (H >= 0) return Math.floor(H / 18) + (si <= H % 18 ? 1 : 0);
+  var a = -H; return -(Math.floor(a / 18) + (si > 18 - (a % 18) ? 1 : 0));
+}
+function scoreCardHtml() {
+  var g = S.golf || {}, c = S.card, k = c.p;
+  var row = (g.classement || []).filter(function (r) { return r.nom === c.nom; })[0] || {};
+  var part = (row.parties || [])[k] || {};
+  var course = (g.parcours || [])[k] || {};
+  var holes = course.trous || [];
+  var scores = part.trous || [];
+  var hcp = part.hcp != null ? part.hcp : (k === 0 && g.index ? g.index[c.nom] : null);
+  var tb = 0, tn = 0, tp = 0, sb = 0, sn = 0, sp = 0, nb = 0, body = '';
+  for (var i = 0; i < 18; i++) {
+    var hp = holes[i] || {}, b = scores[i];
+    var st = hcp != null ? strokesOn(hcp, hp.si) : 0;
+    var has = b != null && b !== '';
+    var n = has ? (+b - st) : null;
+    if (has) { tb += +b; tn += n; sb += +b; sn += n; nb++; }
+    if (hp.par) { tp += +hp.par; sp += +hp.par; }
+    var cls = has && hp.par ? (+b < +hp.par ? ' bd' : (+b > +hp.par ? ' bg' : '')) : '';
+    body += '<tr><td style="color:var(--mute)">' + (i + 1) + '</td><td>' + (hp.par || '—') + '</td><td style="color:var(--mute);font-size:12px">' + (hp.si || '—') + (st > 0 ? ' <span style="color:var(--gold2)">' + '•'.repeat(Math.min(st, 3)) + '</span>' : '') + '</td><td><span class="u' + cls + '">' + (has ? esc(b) : '—') + '</span></td><td style="font-weight:600">' + (has ? n : '—') + '</td></tr>';
+    if (i === 8 || i === 17) {
+      body += '<tr class="sub"><td>' + (i === 8 ? 'Aller' : 'Retour') + '</td><td>' + (sp || '—') + '</td><td></td><td>' + (nb ? sb : '—') + '</td><td>' + (nb ? sn : '—') + '</td></tr>';
+      sb = 0; sn = 0; sp = 0;
+    }
+  }
+  var brutT = part.brut != null ? part.brut : (nb === 18 ? tb : null);
+  var netT = part.net != null ? part.net : (brutT != null && hcp != null ? Math.round((brutT - hcp) * 10) / 10 : null);
+  return '<div class="ov" role="dialog" aria-label="Carte de score"><div class="in">' + header('Carte de score', esc(c.nom)) +
+    '<div class="row" style="margin:6px 20px 0;justify-content:space-between"><button type="button" data-act="closeCard" style="min-height:44px;border:0;background:none;color:var(--gold2);font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px;padding:0">' + ic('back', 18, 'currentColor', 2) + 'Golf</button><span class="small" style="font-size:13px">' + golfLabel(k) + '</span></div>' +
+    '<section class="sec" style="margin-top:8px"><div class="card" style="flex-direction:row;justify-content:space-between;padding:14px 18px"><div><div class="small">Parcours</div><div style="font-weight:600">' + esc(course.nom || 'À venir') + '</div></div><div style="text-align:right"><div class="small">Handicap du jour</div><div style="font-weight:600;color:var(--gold2)">' + fnum(hcp) + '</div></div></div>' +
+    '<div class="card" style="padding:6px 10px 0;overflow:hidden"><table class="sc"><thead><tr><th>Trou</th><th>Par</th><th>Hcp</th><th>Brut</th><th>Net</th></tr></thead><tbody>' + body +
+    '<tr class="tot"><td>Total</td><td>' + (tp || '—') + '</td><td></td><td>' + fnum(brutT) + '</td><td>' + fnum(netT) + '</td></tr></tbody></table></div>' +
+    '<p class="small" style="margin:0">Net par trou = brut − coups reçus (points dorés), répartis selon le handicap des trous. Total net = brut − handicap du jour, comme dans le règlement.</p></section></div></div>';
+}
+function newDraft() { return { amount: '', label: '', date: iso(new Date()), payer: S.me || '', shares: NAMES.slice() }; }
+function stepValid(st, d) {
+  return [parseAmount(d.amount) > 0, d.label.trim().length > 0, /^\d{4}-\d{2}-\d{2}$/.test(d.date), NAMES.indexOf(d.payer) >= 0, d.shares.length > 0][st - 1];
+}
+function sheetHtml() {
+  var st = S.sheet.step, d = S.sheet.draft, c = parseAmount(d.amount), body = '';
+  if (st === 1) body = '<label for="f-amt" class="qt">Quel montant ?</label><div class="amt"><input id="f-amt" data-f="amount" data-autofocus type="text" inputmode="decimal" placeholder="0,00" value="' + esc(d.amount) + '" autocomplete="off"><span class="big" style="font-size:36px;color:var(--gold2)">€</span></div>';
+  if (st === 2) body = '<label for="f-lbl" class="qt">Objet de la dépense</label><input id="f-lbl" class="field" data-f="label" data-autofocus type="text" placeholder="Ex. dîner au restaurant" value="' + esc(d.label) + '" autocomplete="off"><div class="row" style="flex-wrap:wrap;gap:8px">' + ['Restaurant', 'Bar', 'Green fees', 'Taxi', 'Courses', 'Excursion'].map(function (q) { return '<button type="button" class="pill" data-quick="' + q + '">' + q + '</button>'; }).join('') + '</div>';
+  if (st === 3) body = '<label for="f-dt" class="qt">Date</label><input id="f-dt" class="field" data-f="date" type="date" value="' + esc(d.date) + '"><span class="small">Aujourd\'hui par défaut, modifiable.</span>';
+  if (st === 4) body = '<span class="qt">Qui a payé ?</span><div class="grid2">' + NAMES.map(function (n) { return '<button type="button" class="opt' + (d.payer === n ? ' on' : '') + '" data-payer="' + n + '" aria-pressed="' + (d.payer === n) + '">' + n + '</button>'; }).join('') + '</div>';
+  if (st === 5) {
+    var all = d.shares.length === NAMES.length;
+    body = '<span class="qt">Qui est concerné ?</span><button type="button" class="btn ghost" style="min-height:44px;border-style:dashed" data-act="allShares">' + (all ? 'Désélectionner tout le monde' : 'Tout le monde') + '</button><div class="grid2">' + NAMES.map(function (n) { var on = d.shares.indexOf(n) >= 0; return '<button type="button" class="opt' + (on ? ' on' : '') + '" data-share="' + n + '" aria-pressed="' + on + '">' + (on ? '✓ ' : '') + n + '</button>'; }).join('') + '</div><span style="font-size:13px;color:var(--soft)">' + (d.shares.length && c > 0 ? eur(c) + ' ÷ ' + d.shares.length + ' = ' + eur(Math.round(c / d.shares.length)) + ' chacun' : 'Choisis au moins une personne.') + '</span>';
+  }
+  var prog = ''; for (var k = 1; k <= 5; k++) prog += '<span class="' + (k <= st ? 'on' : '') + '"></span>';
+  return '<div class="ov" role="dialog" aria-label="' + (S.sheet.editId ? 'Corriger la dépense' : 'Nouvelle dépense') + '"><div class="in">' + header('Budget', S.sheet.editId ? 'Corriger' : 'Nouvelle dépense') +
+    '<div class="row" style="margin:6px 20px 0;justify-content:space-between"><span class="small" style="font-size:13px">Étape ' + st + ' / 5</span><button type="button" class="icon-btn" data-act="closeSheet" aria-label="Annuler">' + ic('x', 18, 'currentColor', 2) + '</button></div><div class="prog">' + prog + '</div>' +
+    '<form id="sheetForm" class="sec" style="margin-top:24px"><div class="card hl" style="padding:22px;border-radius:24px;gap:16px;min-height:280px">' + body + '</div>' +
+    '<div class="row" style="gap:12px;margin-top:6px">' + (st > 1 ? '<button type="button" class="btn ghost grow" data-act="prev">Retour</button>' : '') + '<button type="submit" class="btn" style="flex:2" id="nextBtn"' + (stepValid(st, d) ? '' : ' disabled') + '>' + (st === 5 ? (S.sheet.editId ? 'Enregistrer la correction' : 'Enregistrer la dépense') : 'Suivant') + '</button></div></form></div></div>';
+}
+
+/* ---------- render ---------- */
+function render() {
+  var v = S.view;
+  var html = v === 'voyage' ? vVoyage() : v === 'meteo' ? vMeteo() : v === 'golf' ? vGolf() : v === 'budget' ? vBudget() : v === 'medias' ? vMedias() : vAccueil();
+  document.getElementById('app').innerHTML = html;
+  var tabs = [['accueil', 'home', 'Accueil'], ['voyage', 'voyage', 'Voyage'], ['meteo', 'meteo', 'Météo'], ['golf', 'golf', 'Golf'], ['budget', 'budget', 'Budget'], ['medias', 'medias', 'Médias']];
+  document.getElementById('tabs').innerHTML = tabs.map(function (t) { return '<a href="#' + t[0] + '" class="' + (v === t[0] ? 'on' : '') + '"' + (v === t[0] ? ' aria-current="page"' : '') + '>' + ic(t[1]) + t[2] + '</a>'; }).join('');
+  if (!S.sheet) renderLayer();
+}
+function route() {
+  var h = (location.hash || '').replace('#', '');
+  S.view = ['voyage', 'meteo', 'golf', 'budget', 'medias'].indexOf(h) >= 0 ? h : 'accueil';
+  S.detail = false; S.trash = false; S.card = null; S.conv = false; S.plug = false; S.agent = false; S.person = null; S.sheet = null; S.lightbox = null; S.confirm = null;
+  render(); window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+
+/* ---------- events ---------- */
+document.addEventListener('click', function (ev) {
+  var t = ev.target.closest('button, [data-act]'); if (!t) return;
+  var a = t.getAttribute('data-act');
+  if (t.hasAttribute('data-gtab')) { S.golfTab = t.getAttribute('data-gtab'); render(); return; }
+  if (t.hasAttribute('data-quickmur')) { var m = document.getElementById('cv-mur'); if (m) { m.value = t.getAttribute('data-quickmur'); convFrom('mur'); } return; }
+  if (t.hasAttribute('data-copy')) {
+    var txt = t.getAttribute('data-copy');
+    try { navigator.clipboard.writeText(txt).then(function () { toast('Copié : ' + txt); }, function () { toast('Copie impossible : appui long sur le texte.'); }); } catch (e) { toast('Copie impossible : appui long sur le texte.'); }
+    return;
+  }
+  if (t.hasAttribute('data-person')) { S.person = t.getAttribute('data-person'); renderLayer(); return; }
+  if (t.hasAttribute('data-card')) { var cp = t.getAttribute('data-card').split(':'); S.card = { nom: cp[0], p: +cp[1] }; renderLayer(); return; }
+  if (t.hasAttribute('data-gopen')) { var g = t.getAttribute('data-gopen'); S.golfOpen = S.golfOpen === g ? null : g; render(); return; }
+  if (t.hasAttribute('data-mf')) { S.mediaFilter = t.getAttribute('data-mf'); render(); return; }
+  if (t.hasAttribute('data-open')) { S.lightbox = t.getAttribute('data-open'); renderLayer(); return; }
+  if (t.hasAttribute('data-restore')) { if (!S.db || S.readOnly) { toast('Lecture seule : restauration impossible.'); return; } var rp = t.getAttribute('data-restore').split(':'); restore(rp[0], rp[1]); return; }
+  if (t.hasAttribute('data-quick')) { S.sheet.draft.label = t.getAttribute('data-quick'); renderLayer(); return; }
+  if (t.hasAttribute('data-payer')) { S.sheet.draft.payer = t.getAttribute('data-payer'); renderLayer(); return; }
+  if (t.hasAttribute('data-share')) { var s = t.getAttribute('data-share'), sh = S.sheet.draft.shares, k = sh.indexOf(s); if (k >= 0) sh.splice(k, 1); else sh.push(s); S.sheet.draft.shares = NAMES.filter(function (x) { return sh.indexOf(x) >= 0; }); renderLayer(); return; }
+  switch (a) {
+    case 'detail': S.detail = true; renderLayer(); break;
+    case 'closeDetail': S.detail = false; renderLayer(); break;
+    case 'openTrash': S.trash = true; renderLayer(); break;
+    case 'closeTrash': S.trash = false; renderLayer(); break;
+    case 'add': if (!S.db || S.readOnly) { toast('Connexion aux données du groupe requise.'); break; } S.sheet = { step: 1, draft: newDraft() }; renderLayer(); break;
+    case 'closeSheet': S.sheet = null; renderLayer(); break;
+    case 'prev': S.sheet.step = Math.max(1, S.sheet.step - 1); renderLayer(); break;
+    case 'allShares': S.sheet.draft.shares = S.sheet.draft.shares.length === NAMES.length ? [] : NAMES.slice(); renderLayer(); break;
+    case 'closeLb': S.lightbox = null; renderLayer(); break;
+    case 'closeCard': S.card = null; renderLayer(); break;
+    case 'openConv': S.conv = true; renderLayer(); setTimeout(function () { var e = document.getElementById('cv-mur'); if (e) { e.value = '500'; convFrom('mur'); e.focus(); } }, 30); break;
+    case 'closeConv': S.conv = false; renderLayer(); break;
+    case 'openPlug': S.plug = true; renderLayer(); break;
+    case 'closePerson': S.person = null; renderLayer(); break;
+    case 'closePersonBg': if (ev.target === t) { S.person = null; renderLayer(); } break;
+    case 'openAgent': S.agent = true; renderLayer(); break;
+    case 'closeAgent': S.agent = false; renderLayer(); break;
+    case 'closeAgentBg': if (ev.target === t) { S.agent = false; renderLayer(); } break;
+    case 'closePlug': S.plug = false; renderLayer(); break;
+    case 'closePlugBg': if (ev.target === t) { S.plug = false; renderLayer(); } break;
+    case 'closeConvBg': if (ev.target === t) { S.conv = false; renderLayer(); } break;
+    case 'dlMedia': downloadMedia(S.lightbox); break;
+    case 'delMedia': S.confirm = { kind: 'media', id: S.lightbox, title: 'Supprimer ce média\u00a0?', text: 'Il ira dans la corbeille, d\'où on pourra le restaurer.' }; renderLayer(); break;
+    case 'cfNo': S.confirm = null; renderLayer(); break;
+    case 'cfYes': doConfirm(); break;
+  }
+});
+function convFrom(src) {
+  var tx = S.change && +S.change.taux; if (!tx) return;
+  var a = document.getElementById(src === 'eur' ? 'cv-eur' : 'cv-mur'), b = document.getElementById(src === 'eur' ? 'cv-mur' : 'cv-eur');
+  if (!a || !b) return;
+  var v = parseFloat(String(a.value).replace(/\s/g, '').replace(',', '.'));
+  if (isNaN(v)) { b.value = ''; return; }
+  var r = src === 'eur' ? v * tx : v / tx;
+  b.value = r.toLocaleString('fr-FR', { minimumFractionDigits: src === 'eur' ? 0 : 2, maximumFractionDigits: src === 'eur' ? 0 : 2 });
+}
+document.addEventListener('input', function (ev) {
+  var cv = ev.target.getAttribute && ev.target.getAttribute('data-conv');
+  if (cv) { convFrom(cv); return; }
+  var f = ev.target.getAttribute && ev.target.getAttribute('data-f');
+  if (!f || !S.sheet) return;
+  S.sheet.draft[f] = ev.target.value;
+  var b = document.getElementById('nextBtn'); if (b) b.disabled = !stepValid(S.sheet.step, S.sheet.draft);
+});
+document.addEventListener('submit', function (ev) {
+  if (ev.target.id !== 'sheetForm') return;
+  ev.preventDefault();
+  var sh = S.sheet; if (!sh || !stepValid(sh.step, sh.draft)) return;
+  if (sh.step < 5) { sh.step++; renderLayer(); return; }
+  saveExpense(sh);
+});
+document.addEventListener('change', function (ev) {
+  if (ev.target.id === 'up') { uploadFiles(ev.target.files); ev.target.value = ''; }
+});
+
+/* swipe to delete */
+var drag = null;
+document.addEventListener('pointerdown', function (ev) {
+  var f = ev.target.closest && ev.target.closest('[data-swipe]'); if (!f) return;
+  drag = { el: f, id: f.getAttribute('data-swipe'), x0: ev.clientX, y0: ev.clientY, dx: 0, lock: null };
+  f.style.transition = 'none';
+});
+document.addEventListener('pointermove', function (ev) {
+  if (!drag) return;
+  var dx = ev.clientX - drag.x0, dy = ev.clientY - drag.y0;
+  if (drag.lock === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) drag.lock = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+  if (drag.lock !== 'x') return;
+  drag.dx = Math.max(-130, Math.min(130, dx));
+  drag.el.style.transform = 'translateX(' + drag.dx + 'px)';
+  var sw = drag.el.parentNode, l = sw.querySelector('.back.edit'), r = sw.querySelector('.back.del');
+  sw.style.background = drag.dx < 0 ? '#8E2B37' : (drag.dx > 0 ? '#D4AF5A' : 'var(--card)');
+  l.style.opacity = drag.dx > 0 ? 1 : 0; r.style.opacity = drag.dx < 0 ? 1 : 0;
+});
+function endDrag() {
+  if (!drag) return;
+  var d = drag; drag = null;
+  d.el.style.transition = 'transform .2s ease';
+  d.el.style.transform = 'translateX(0)';
+  setTimeout(function () { var sw = d.el.parentNode; if (sw) { sw.style.background = ''; sw.querySelectorAll('.back').forEach(function (b) { b.style.opacity = 0; }); } }, 200);
+  var e = S.expenses.filter(function (x) { return x.id === d.id; })[0];
+  if (!e || Math.abs(d.dx) < 80) return;
+  if (!S.db || S.readOnly) { toast('Lecture seule : modification impossible.'); return; }
+  if (d.dx > 0) {
+    S.sheet = { step: 1, editId: e.id, createdAt: e.createdAt, draft: { amount: (e.cents / 100).toFixed(2).replace('.', ','), label: e.label, date: e.date, payer: e.payer, shares: e.shares.slice() } };
+    renderLayer(); return;
+  }
+  {
+    S.confirm = { kind: 'expense', id: e.id, title: 'Supprimer cette dépense\u00a0?', text: '« ' + e.label + ' » · ' + eur(e.cents) + ' payé par ' + e.payer + '. Elle ira dans la corbeille, d\'où on pourra la restaurer.' };
+    renderLayer();
+  }
+}
+document.addEventListener('pointerup', endDrag);
+document.addEventListener('pointercancel', endDrag);
+
+/* ---------- data ops ---------- */
+function saveExpense(sh) {
+  var d = sh.draft, btn = document.getElementById('nextBtn'); if (btn) btn.disabled = true;
+  var body = { cents: parseAmount(d.amount), label: d.label.trim().slice(0, 120), date: d.date, payer: d.payer, shares: d.shares.slice(), createdAt: sh.editId ? (sh.createdAt || Date.now()) : Date.now(), by: S.me || '' };
+  if (sh.editId) body.editedAt = Date.now();
+  var p = sh.editId ? S.db.collection('expenses').doc(sh.editId).set(body) : S.db.collection('expenses').add(body);
+  p.then(function () {
+    S.sheet = null; renderLayer(); toast(sh.editId ? 'Dépense corrigée.' : 'Dépense enregistrée.');
+  }, function (e) { if (btn) btn.disabled = false; onWriteError(e); });
+}
+function doConfirm() {
+  var c = S.confirm; S.confirm = null;
+  var mark = { deleted: true, deletedAt: Date.now(), deletedBy: S.me || '' };
+  if (c.kind === 'expense') {
+    S.db.collection('expenses').doc(c.id).update(mark).then(function () { toast('Dépense mise à la corbeille.'); }, onWriteError);
+    renderLayer();
+  } else if (c.kind === 'media') {
+    S.lightbox = null; renderLayer();
+    S.db.collection('medias').doc(c.id).update(mark).then(function () { toast('Média mis à la corbeille.'); }, onWriteError);
+  }
+}
+function restore(col, id) {
+  S.db.collection(col).doc(id).update({ deleted: false, deletedAt: 0, deletedBy: '' }).then(function () { toast(col === 'expenses' ? 'Dépense restaurée.' : 'Média restauré.'); }, onWriteError);
+}
+function downloadMedia(id) {
+  var m = S.medias.filter(function (x) { return x.id === id; })[0];
+  if (!m) return;
+  toast('Préparation du fichier…');
+  fetch(mediaSrc(m)).then(function (r) { if (!r.ok) throw new Error('http'); return r.blob(); }).then(function (b) {
+    var ext = (m.assetId.split('.').pop() || 'jpg').toLowerCase();
+    var name = 'AG2027_' + (m.date || 'photo') + '_' + m.id.slice(0, 5) + '.' + ext;
+    var file = null;
+    try { file = new File([b], name, { type: b.type || (m.kind === 'video' ? 'video/mp4' : 'image/jpeg') }); } catch (e) {}
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+      return navigator.share({ files: [file] }).catch(function (e) { if (!e || e.name !== 'AbortError') throw e; });
+    }
+    var u = URL.createObjectURL(b), a = document.createElement('a');
+    a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+  }).catch(function () { toast('Téléchargement impossible pour le moment.'); });
+}
+function shrinkImage(f) {
+  return new Promise(function (res) {
+    if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { res(f); return; }
+    var url = URL.createObjectURL(f), img = new Image();
+    img.onload = function () {
+      var max = 2048, w = img.naturalWidth, h = img.naturalHeight, k = Math.min(1, max / Math.max(w, h));
+      if (k === 1 && f.size < 1.5e6) { URL.revokeObjectURL(url); res(f); return; }
+      var c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      c.toBlob(function (b) { URL.revokeObjectURL(url); res(b && b.size < f.size ? b : f); }, 'image/jpeg', 0.85);
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); res(f); };
+    img.src = url;
+  });
+}
+function uploadFiles(files) {
+  if (!files || !files.length || !S.db) return;
+  var list = Array.prototype.slice.call(files), done = 0, failed = 0;
+  toast('Envoi de ' + list.length + ' fichier' + (list.length > 1 ? 's' : '') + '…');
+  (function next() {
+    var f = list.shift();
+    if (!f) { toast(done + ' média' + (done > 1 ? 's' : '') + ' partagé' + (done > 1 ? 's' : '') + (failed ? ' · ' + failed + ' échec(s) (50 Mo max.)' : '') + '.'); return; }
+    var isVid = /^video\//.test(f.type);
+    (isVid ? Promise.resolve(f) : shrinkImage(f)).then(function (blob) {
+      if (blob.size > 50 * 1024 * 1024) throw { code: 'too_large' };
+      var ext = isVid ? ((f.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4') : (blob.type === 'image/png' ? 'png' : blob.type === 'image/webp' ? 'webp' : 'jpg');
+      var path = Date.now() + '_' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+      return SB.upload(path, blob, blob.type || f.type).then(function () {
+        return S.db.collection('medias').add({ assetId: path, kind: isVid ? 'video' : 'photo', by: '', date: iso(new Date()), caption: '', createdAt: Date.now() });
+      });
+    }).then(function () { done++; next(); }, function (e) { failed++; if (e && e.code === 'invalid_argument') onWriteError(e); next(); });
+  })();
+}
+/* ---------- boot ---------- */
+var SB_URL = 'https://hhjhyhcpqebwfqaxunva.supabase.co';
+var SB_KEY = 'sb_publishable_T3zdYlGEBtNHD0fJTYCQXg_TsahGWM0';
+var CODE = '';
+function mediaSrc(m) { return SB_URL + '/storage/v1/object/public/medias/' + encodeURIComponent(m.assetId); }
+var SB = {
+  h: function (extra) { var o = { apikey: SB_KEY, 'x-ag-code': CODE }; for (var k in extra) o[k] = extra[k]; return o; },
+  req: function (method, path, body, extra) {
+    return fetch(SB_URL + path, { method: method, headers: SB.h(extra || { 'Content-Type': 'application/json' }), body: body == null ? undefined : (typeof body === 'string' || body instanceof Blob ? body : JSON.stringify(body)) }).then(function (r) {
+      if (r.ok) return r.status === 204 ? null : r.text().then(function (x) { return x ? JSON.parse(x) : null; });
+      return r.text().then(function (x) { var e = { code: (r.status === 401 || r.status === 403 || /42501|row-level security/i.test(x)) ? 'invalid_argument' : 'unavailable', message: x }; throw e; });
+    });
+  },
+  upload: function (path, blob, type) { return SB.req('POST', '/storage/v1/object/medias/' + encodeURIComponent(path), blob, { 'Content-Type': type || 'application/octet-stream', 'x-upsert': 'false' }); }
+};
+var RAW = { expenses: {}, medias: {} };
+function rid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 10); }
+S.db = {
+  collection: function (col) {
+    return {
+      add: function (body) { var id = rid(); return SB.req('POST', '/rest/v1/' + col, { id: id, data: body }, { 'Content-Type': 'application/json', Prefer: 'return=minimal' }).then(function () { return loadCol(col); }); },
+      doc: function (id) {
+        return {
+          set: function (body) { return SB.req('PATCH', '/rest/v1/' + col + '?id=eq.' + encodeURIComponent(id), { data: body, updated_at: new Date().toISOString() }, { 'Content-Type': 'application/json', Prefer: 'return=minimal' }).then(function () { return loadCol(col); }); },
+          update: function (patch) { var cur = RAW[col][id] || {}, nb = {}; for (var k in cur) nb[k] = cur[k]; for (var j in patch) nb[j] = patch[j]; return this.set(nb); }
+        };
+      }
+    };
+  }
+};
+function mapExp(id, x) { return { id: id, cents: Math.round(+x.cents || 0), label: String(x.label || ''), date: String(x.date || ''), payer: String(x.payer || ''), shares: Array.isArray(x.shares) ? x.shares.map(String) : [], createdAt: +x.createdAt || 0, deleted: x.deleted === true, deletedAt: +x.deletedAt || 0, deletedBy: String(x.deletedBy || '') }; }
+function mapMed(id, x) { return { id: id, assetId: String(x.assetId || ''), kind: x.kind === 'video' ? 'video' : 'photo', by: String(x.by || ''), date: String(x.date || ''), caption: String(x.caption || ''), createdAt: +x.createdAt || 0, deleted: x.deleted === true, deletedAt: +x.deletedAt || 0, deletedBy: String(x.deletedBy || '') }; }
+var lastSig = {};
+function loadCol(col) {
+  return SB.req('GET', '/rest/v1/' + col + '?select=id,data&order=id.asc', null, {}).then(function (rows) {
+    rows = rows || [];
+    var sig = JSON.stringify(rows); S.dbState = 'ready';
+    if (lastSig[col] === sig) return; lastSig[col] = sig;
+    RAW[col] = {}; rows.forEach(function (r) { RAW[col][r.id] = r.data || {}; });
+    if (col === 'expenses') {
+      var all = rows.map(function (r) { return mapExp(r.id, r.data || {}); });
+      S.expTrash = all.filter(function (e) { return e.deleted; }).sort(function (a, b) { return b.deletedAt - a.deletedAt; });
+      S.expenses = all.filter(function (e) { return !e.deleted; });
+    } else {
+      var med = rows.map(function (r) { return mapMed(r.id, r.data || {}); }).filter(function (m) { return /^[A-Za-z0-9_.-]+$/.test(m.assetId); }).sort(function (a, b) { return b.createdAt - a.createdAt; });
+      S.medTrash = med.filter(function (m) { return m.deleted; }).sort(function (a, b) { return b.deletedAt - a.deletedAt; });
+      S.medias = med.filter(function (m) { return !m.deleted; });
+    }
+    render();
+  }).catch(function (e) { if (e && e.code === 'invalid_argument') { S.readOnly = true; } else if (S.dbState !== 'ready') { S.dbState = 'slow'; } render(); });
+}
+function loadJson(name, key) {
+  return fetch('data/' + name + '.json?v=' + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d && JSON.stringify(d) !== JSON.stringify(S[key])) { S[key] = d; render(); } }).catch(function () {});
+}
+var WMO = { 0: 'Ensoleillé', 1: 'Plutôt ensoleillé', 2: 'Partiellement nuageux', 3: 'Couvert', 45: 'Brouillard', 48: 'Brouillard', 51: 'Bruine', 53: 'Bruine', 55: 'Bruine', 61: 'Pluie faible', 63: 'Pluie', 65: 'Forte pluie', 80: 'Averses', 81: 'Averses', 82: 'Fortes averses', 95: 'Orages', 96: 'Orages', 99: 'Orages' };
+function loadWeather() {
+  var u = 'https://api.open-meteo.com/v1/forecast?latitude=-20.27&longitude=57.76&current=temperature_2m,weather_code,wind_speed_10m,precipitation_probability,uv_index&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,wind_speed_10m_max&timezone=Indian%2FMauritius&forecast_days=16';
+  fetch(u).then(function (r) { return r.json(); }).then(function (d) {
+    var m = { lieu: 'Anahita', jours: {}, hasTrip: false };
+    if (d.current) m.now = { tmax: Math.round(d.current.temperature_2m), ciel: WMO[d.current.weather_code] || '', vent: Math.round(d.current.wind_speed_10m), pluie: d.current.precipitation_probability, uv: d.current.uv_index != null ? Math.round(d.current.uv_index) : null };
+    var dd = d.daily || {};
+    (dd.time || []).forEach(function (day, i) {
+      var p = day.split('-');
+      if (p[0] === '2027' && p[1] === '01' && +p[2] >= 22 && +p[2] <= 31) {
+        m.hasTrip = true;
+        m.jours[String(+p[2])] = { tmax: Math.round(dd.temperature_2m_max[i]), tmin: Math.round(dd.temperature_2m_min[i]), ciel: WMO[dd.weather_code[i]] || '', pluie: dd.precipitation_probability_max[i], vent: Math.round(dd.wind_speed_10m_max[i]) };
+      }
+    });
+    S.meteo = m; render();
+  }).catch(function () {});
+}
+function loadRate() {
+  fetch('https://open.er-api.com/v6/latest/EUR').then(function (r) { return r.json(); }).then(function (d) {
+    if (d && d.rates && d.rates.MUR) { S.change = { taux: Math.round(d.rates.MUR * 100) / 100, date: iso(new Date((d.time_last_update_unix || Date.now() / 1000) * 1000)) }; render(); }
+    else throw 0;
+  }).catch(function () { loadJson('change', 'change'); });
+}
+function b64(s) { var b = atob(s), a = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return a; }
+function unlock(code) {
+  return fetch('data/secret.json?v=' + Date.now()).then(function (r) { return r.json(); }).then(function (s) {
+    var enc = new TextEncoder();
+    return crypto.subtle.importKey('raw', enc.encode(code), 'PBKDF2', false, ['deriveKey']).then(function (base) {
+      return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64(s.salt), iterations: s.iter, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+    }).then(function (key) { return crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(s.iv) }, key, b64(s.ct)); }).then(function (pt) {
+      var d = JSON.parse(new TextDecoder().decode(pt)); CONTACTS = d.contacts || {}; DOSSIER = d.dossier || ''; CODE = code; return true;
+    });
+  });
+}
+function startData() {
+  loadCol('expenses'); loadCol('medias');
+  loadJson('voyage', 'voyage'); loadJson('golf', 'golf');
+  loadWeather(); loadRate();
+  setInterval(function () { if (!document.hidden) { loadCol('expenses'); loadCol('medias'); } }, 20000);
+  setInterval(function () { if (!document.hidden) { loadJson('voyage', 'voyage'); loadJson('golf', 'golf'); } }, 300000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) { loadCol('expenses'); loadCol('medias'); loadJson('golf', 'golf'); loadJson('voyage', 'voyage'); } });
+}
+function showGate(err) {
+  var g = document.getElementById('gate');
+  g.hidden = false;
+  g.innerHTML = '<div style="max-width:380px;margin:0 auto;padding:40px 24px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center"><img src="logo.png" alt="Logo AG 2027 Île Maurice" style="width:200px;height:auto"><p style="margin:0;color:var(--soft);font-size:15px">Site réservé à la bande AG 2027.</p><form id="gateForm" style="width:100%;display:flex;flex-direction:column;gap:12px"><label for="gateCode" class="small" style="text-transform:uppercase;letter-spacing:2px">Code d\'accès</label><input id="gateCode" class="field" type="password" autocomplete="current-password" autocapitalize="off" style="text-align:center;font-size:18px"><button type="submit" class="btn">Entrer</button>' + (err ? '<span style="color:var(--neg);font-size:14px">Code incorrect.</span>' : '') + '</form></div>';
+  setTimeout(function () { var i = document.getElementById('gateCode'); if (i) i.focus(); }, 50);
+}
+document.addEventListener('submit', function (ev) {
+  if (ev.target.id !== 'gateForm') return;
+  ev.preventDefault();
+  var code = document.getElementById('gateCode').value.trim();
+  unlock(code).then(function () { lsSet('ag27-code', code); document.getElementById('gate').hidden = true; route(); startData(); }, function () { showGate(true); });
+});
+var saved = lsGet('ag27-code');
+if (saved) {
+  unlock(saved).then(function () { route(); startData(); }, function () { lsSet('ag27-code', ''); showGate(false); });
+} else { showGate(false); }
+})();
+</script>
+</body>
+</html>

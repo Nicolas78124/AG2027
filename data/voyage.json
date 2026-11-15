@@ -1,0 +1,35 @@
+{
+ "aller": {
+  "de": "ORY",
+  "vers": "MRU",
+  "heureDepart": "21h15",
+  "heureArrivee": "11h55 (23 janv.)",
+  "vol": "Corsair"
+ },
+ "retour": {
+  "date": "sam. 30 janv.",
+  "de": "MRU",
+  "vers": "ORY",
+  "heureDepart": "21h40",
+  "heureArrivee": "7h00 (31 janv.)",
+  "vol": "Corsair"
+ },
+ "jours": {
+  "22": {
+   "titre": "Départ",
+   "texte": "Décollage d'Orly à 21h15 pour Maurice"
+  },
+  "23": {
+   "titre": "Arrivée à Maurice",
+   "texte": "Atterrissage à Maurice à 11h55"
+  },
+  "30": {
+   "titre": "Retour",
+   "texte": "Décollage de Maurice à 21h40 pour Paris"
+  },
+  "31": {
+   "titre": "Arrivée à Paris",
+   "texte": "Atterrissage à Paris à 7h00"
+  }
+ }
+}
