@@ -58,6 +58,7 @@ nav.tabs .in{max-width:560px;margin:0 auto;display:flex}
 nav.tabs a{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;min-height:48px;color:var(--mute);font-size:11px;font-weight:500}
 nav.tabs a.on{color:var(--gold2)}
 /* home */
+.app{position:relative}
 .hero{display:flex;flex-direction:column;align-items:center;padding:26px 24px 4px;gap:12px}
 .hero img{width:min(240px,62vw);height:auto;display:block}
 .tile{display:flex;flex-direction:column;gap:10px;padding:18px 16px;border-radius:18px;background:var(--card);border:1px solid rgba(212,175,90,.28);color:var(--ink)}
@@ -238,7 +239,8 @@ function vAccueil() {
   function tile(href, icon, t, desc, wide) {
     return '<a class="tile" href="#' + href + '"' + (wide ? ' style="grid-column:span 2;flex-direction:row;align-items:center;gap:16px;background:var(--card2);border-color:var(--gold)"' : '') + '>' + ic(icon, wide ? 34 : 26, '#E9C977', 1.6) + (wide ? '<div class="grow" style="display:flex;flex-direction:column;gap:4px">' : '') + '<span class="t">' + t + '</span><span class="d">' + desc + '</span>' + (wide ? '</div>' + ic('chev', 20, '#E9C977', 2) : '') + '</a>';
   }
-  return '<header class="hero"><img src="logo.png" alt="Logo AG 2027 Île Maurice"><p style="margin:0;font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);font-weight:600">Golf · Amis · Océan Indien</p></header>' +
+  var off = S.offline ? '<div role="status" aria-label="Hors connexion" style="position:absolute;top:14px;right:16px;display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#3A2030;border:1px solid var(--neg);color:var(--neg);font-size:12px;font-weight:600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 2l20 20M8.5 16.4a5 5 0 0 1 7 0M5 12.9a10 10 0 0 1 5.2-2.8M19 12.9a10 10 0 0 0-2.3-1.7M2 8.8a15 15 0 0 1 4.2-2.6M22 8.8A15 15 0 0 0 11 5.1M12 20h.01"/></svg>Hors ligne</div>' : '';
+  return off + '<header class="hero"><img src="logo.png" alt="Logo AG 2027 Île Maurice"><p style="margin:0;font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);font-weight:600">Golf · Amis · Océan Indien</p></header>' +
     dbNote() + count +
     '<section class="sec"><h2 class="script">La bande</h2><div style="display:flex;justify-content:space-between">' + players + '</div></section>' +
     '<section class="sec grid2" style="display:grid">' +
@@ -961,6 +963,10 @@ function unlock(code) {
     });
   });
 }
+S.offline = !navigator.onLine;
+window.addEventListener('online', function () { S.offline = false; render(); loadCol('expenses'); loadCol('medias'); loadWeather(); loadRate(); });
+window.addEventListener('offline', function () { S.offline = true; render(); });
+if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
 function startData() {
   loadCol('expenses'); loadCol('medias');
   loadJson('voyage', 'voyage'); loadJson('golf', 'golf');
