@@ -347,7 +347,7 @@ function vGolf() {
   var t = TEAMS[Math.min(5, Math.max(0, nxt - 1))];
   var day = (nxt > 6 || (g.parties && g.parties.length >= 6)) ? '' :
     '<section class="sec"><div class="card gold" style="border-radius:22px"><div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--script);font-size:30px;line-height:1.1;color:var(--gold2)">' + (isToday ? 'Partie du jour' : 'Prochaine partie') + '</span><span style="font-size:14px;color:var(--soft)">' + golfLabel(nxt - 1) + '</span></div><div class="grid2"><div class="team" style="background:var(--blue)"><span class="k">Équipe Bleue · 3</span><strong>' + t[0] + '</strong></div><div class="team" style="background:var(--red)"><span class="k">Équipe Rouge · 2</span><strong>' + t[1] + '</strong></div></div></div></section>';
-  var pdfBtn = '<section class="sec" style="margin-bottom:8px"><a class="btn ghost" href="docs/tableau-des-scores.pdf" target="_blank" rel="noopener"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>Tableau des scores (PDF)</a></section>';
+  var pdfBtn = '<section class="sec" style="margin-bottom:8px"><button type="button" class="btn ghost" data-act="openTab" style="width:100%"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>Tableau des scores</button></section>';
   return header('Tournoi officiel', 'Golf') + dbNote() + '<div class="seg" role="tablist">' + segs + '</div><section class="sec" style="gap:8px">' + body + '</section>' + day + pdfBtn;
 }
 
@@ -436,6 +436,13 @@ function renderLayer() {
   }
   if (S.sheet) h += sheetHtml();
   if (S.golfOpen && S.view === 'golf') h += golfPlayerHtml(S.golfOpen);
+  if (S.tab) {
+    var tv = encodeURIComponent((S.golf && S.golf.majLe) || '') + '-' + Math.floor(Date.now() / 300000);
+    h += '<div class="ov" role="dialog" aria-label="Tableau des scores" style="z-index:70"><div class="in" style="max-width:none">' +
+      '<div class="row" style="padding:calc(14px + env(safe-area-inset-top)) 16px 10px;justify-content:space-between;gap:10px;position:sticky;top:0;background:var(--bg);z-index:2"><button type="button" class="btn ghost" data-act="closeTab" style="min-height:44px;padding:0 14px;font-size:14px">' + ic('back', 18, 'currentColor', 2) + 'Retour</button><span style="font-family:var(--serif);font-size:20px;font-weight:700">Tableau des scores</span><a class="icon-btn" href="docs/tableau-des-scores.pdf?v=' + tv + '" target="_blank" rel="noopener" aria-label="Ouvrir le PDF">' + ic('down', 18, 'currentColor', 2) + '</a></div>' +
+      '<div style="overflow:auto;-webkit-overflow-scrolling:touch;padding:0 12px 20px"><img src="docs/tableau-des-scores.png?v=' + tv + '" alt="Tableau des scores AG 2027" style="display:block;width:1000px;max-width:none;height:auto;border-radius:10px;background:#fff"></div>' +
+      '<p class="small" style="margin:0 16px 20px;text-align:center">Fais glisser pour parcourir le tableau. La flèche ouvre le PDF pour le partager ou l\'imprimer.</p></div></div>';
+  }
   if (S.card) h += scoreCardHtml();
   if (S.person && CONTACTS[S.person]) {
     var P = CONTACTS[S.person], num = P.tel.replace(/[^+\d]/g, ''), wa = num.replace('+', '');
@@ -498,7 +505,7 @@ function renderLayer() {
     h += '<div class="modal"><div class="box" role="alertdialog" aria-labelledby="cft"><span id="cft" style="font-family:var(--serif);font-size:26px;font-weight:700">' + esc(S.confirm.title) + '</span><span style="font-size:14px;color:var(--soft);line-height:1.5">' + esc(S.confirm.text) + '</span><div class="row" style="gap:10px"><button type="button" class="btn ghost grow" data-act="cfNo">Annuler</button><button type="button" class="btn grow" style="background:#B83A48;color:#fff" data-act="cfYes">Supprimer</button></div></div></div>';
   }
   L.innerHTML = h;
-  document.body.style.overflow = (S.detail || S.trash || S.sheet || S.lightbox || S.card || S.conv || S.plug || S.agent || S.person || S.clock || S.golfOpen) ? 'hidden' : '';
+  document.body.style.overflow = (S.detail || S.trash || S.sheet || S.lightbox || S.card || S.conv || S.plug || S.agent || S.person || S.clock || S.golfOpen || S.tab) ? 'hidden' : '';
   if (S.sheet) { var f = L.querySelector('[data-autofocus]'); if (f) setTimeout(function () { try { f.focus(); } catch (e) {} }, 30); }
 }
 
@@ -701,7 +708,7 @@ function render() {
 function route() {
   var h = (location.hash || '').replace('#', '');
   S.view = ['voyage', 'meteo', 'golf', 'budget', 'medias'].indexOf(h) >= 0 ? h : 'accueil';
-  S.detail = false; S.trash = false; S.card = null; S.conv = false; S.plug = false; S.agent = false; S.person = null; S.clock = false; S.golfOpen = null; S.sheet = null; S.lightbox = null; S.confirm = null;
+  S.detail = false; S.trash = false; S.card = null; S.conv = false; S.plug = false; S.agent = false; S.person = null; S.clock = false; S.golfOpen = null; S.tab = false; S.sheet = null; S.lightbox = null; S.confirm = null;
   render(); window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);
@@ -744,6 +751,8 @@ document.addEventListener('click', function (ev) {
     case 'closePerson': S.person = null; renderLayer(); break;
     case 'closePersonBg': if (ev.target === t) { S.person = null; renderLayer(); } break;
     case 'openClock': S.clock = true; renderLayer(); tickClocks(); break;
+    case 'openTab': S.tab = true; renderLayer(); break;
+    case 'closeTab': S.tab = false; renderLayer(); break;
     case 'closeGolf': S.golfOpen = null; renderLayer(); break;
     case 'closeGolfBg': if (ev.target === t) { S.golfOpen = null; renderLayer(); } break;
     case 'closeClock': S.clock = false; renderLayer(); break;
