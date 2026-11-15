@@ -874,10 +874,7 @@ document.addEventListener('submit', function (ev) {
   var code = document.getElementById('gateCode').value.trim();
   unlock(code).then(function () { lsSet('ag27-code', code); document.getElementById('gate').hidden = true; route(); startData(); }, function () { showGate(true); });
 });
-var saved = lsGet('ag27-code');
-if (saved) {
-  unlock(saved).then(function () { route(); startData(); }, function () { lsSet('ag27-code', ''); showGate(false); });
-} else { showGate(false); }
+unlock('Anahita2027').then(function () { route(); startData(); }, function () { route(); startData(); });
 })();
 </script>
 </body>
