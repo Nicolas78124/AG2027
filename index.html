@@ -357,6 +357,28 @@ function vGolf() {
   return header('Tournoi officiel', 'Golf') + dbNote() + '<div class="seg" role="tablist">' + segs + '</div><section class="sec" style="gap:8px">' + body + '</section>' + day + (S.golfTab === 'rank' ? pdfBtn : '');
 }
 
+var PDF_FILE = null;
+function pdfUrl() { return 'docs/tableau-des-scores.pdf?v=' + encodeURIComponent((S.golf && S.golf.majLe) || '') + '-' + Math.floor(Date.now() / 300000); }
+function loadPdf() {
+  return fetch(pdfUrl()).then(function (r) { if (!r.ok) throw 0; return r.blob(); }).then(function (b) {
+    PDF_FILE = new File([b], 'AG2027-tableau-des-scores.pdf', { type: 'application/pdf' }); return PDF_FILE;
+  }).catch(function () { return null; });
+}
+function sharePdf() {
+  var f = PDF_FILE;
+  if (f && navigator.canShare && navigator.canShare({ files: [f] })) {
+    navigator.share({ files: [f], title: 'AG 2027 · Tableau des scores' }).catch(function () {});
+    return;
+  }
+  var go = function (file) {
+    if (!file) { toast('PDF indisponible pour le moment.'); return; }
+    var u = URL.createObjectURL(file), a = document.createElement('a');
+    a.href = u; a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(u); }, 60000);
+  };
+  if (f) go(f); else { toast('Préparation du PDF…'); loadPdf().then(go); }
+}
+
 function computeBudget() {
   var paid = {}, owed = {}, total = 0;
   NAMES.forEach(function (n) { paid[n] = 0; owed[n] = 0; });
@@ -445,9 +467,9 @@ function renderLayer() {
   if (S.tab) {
     var tv = encodeURIComponent((S.golf && S.golf.majLe) || '') + '-' + Math.floor(Date.now() / 300000);
     h += '<div class="ov" role="dialog" aria-label="Tableau des scores" style="z-index:70"><div class="in" style="max-width:none">' +
-      '<div class="row" style="padding:calc(14px + env(safe-area-inset-top)) 16px 10px;justify-content:space-between;gap:10px;position:sticky;top:0;background:var(--bg);z-index:2"><button type="button" class="btn ghost" data-act="closeTab" style="min-height:44px;padding:0 14px;font-size:14px">' + ic('back', 18, 'currentColor', 2) + 'Retour</button><span style="font-family:var(--serif);font-size:20px;font-weight:700">Tableau des scores</span><a class="icon-btn" href="docs/tableau-des-scores.pdf?v=' + tv + '" target="_blank" rel="noopener" aria-label="Ouvrir le PDF">' + ic('down', 18, 'currentColor', 2) + '</a></div>' +
+      '<div class="row" style="padding:calc(14px + env(safe-area-inset-top)) 16px 10px;justify-content:space-between;gap:10px;position:sticky;top:0;background:var(--bg);z-index:2"><button type="button" class="btn ghost" data-act="closeTab" style="min-height:44px;padding:0 14px;font-size:14px">' + ic('back', 18, 'currentColor', 2) + 'Retour</button><span style="font-family:var(--serif);font-size:20px;font-weight:700">Tableau des scores</span><button type="button" class="icon-btn" data-act="sharePdf" aria-label="Partager ou enregistrer le PDF">' + ic('down', 18, 'currentColor', 2) + '</button></div>' +
       '<div style="overflow:auto;-webkit-overflow-scrolling:touch;padding:0 12px 20px"><img src="docs/tableau-des-scores.png?v=' + tv + '" alt="Tableau des scores AG 2027" style="display:block;width:1000px;max-width:none;height:auto;border-radius:10px;background:#fff"></div>' +
-      '<p class="small" style="margin:0 16px 20px;text-align:center">Fais glisser pour parcourir le tableau. La flèche ouvre le PDF pour le partager ou l\'imprimer.</p></div></div>';
+      '<p class="small" style="margin:0 16px 20px;text-align:center">Fais glisser pour parcourir le tableau. La flèche permet d\'enregistrer, partager ou imprimer le PDF.</p></div></div>';
   }
   if (S.card) h += scoreCardHtml();
   if (S.person && CONTACTS[S.person]) {
@@ -761,7 +783,8 @@ document.addEventListener('click', function (ev) {
     case 'closePerson': S.person = null; renderLayer(); break;
     case 'closePersonBg': if (ev.target === t) { S.person = null; renderLayer(); } break;
     case 'openClock': S.clock = true; renderLayer(); tickClocks(); break;
-    case 'openTab': S.tab = true; renderLayer(); break;
+    case 'openTab': S.tab = true; renderLayer(); loadPdf(); break;
+    case 'sharePdf': sharePdf(); break;
     case 'closeTab': S.tab = false; renderLayer(); break;
     case 'closeGolf': S.golfOpen = null; renderLayer(); break;
     case 'closeGolfBg': if (ev.target === t) { S.golfOpen = null; renderLayer(); } break;
