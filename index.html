@@ -89,7 +89,8 @@ nav.tabs a.on{color:var(--gold2)}
 .pscore{font-size:13px;font-weight:700;color:var(--gold2);font-variant-numeric:tabular-nums}
 .pstep{width:100%;border-radius:10px 10px 0 0;background:linear-gradient(180deg,#22386E,#16264F);border:1px solid rgba(212,175,90,.35);border-bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8px;gap:6px}
 .pstep.gold{background:linear-gradient(180deg,#3A3A5A,#22386E);border-color:var(--gold)}
-.prank{font-size:22px;font-weight:800;color:var(--gold2)}
+.prank{font-size:22px;font-weight:800;color:var(--gold2);line-height:1}
+.pnet{margin-top:auto;padding-bottom:8px;font-size:14px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
 .pstep .dots{gap:2px}.pstep .dots span{width:6px;height:4px}
 .rank{display:flex;flex-direction:column;border-radius:16px;background:var(--card);border:1px solid transparent;overflow:hidden}
 .rank.first{background:var(--card2);border-color:var(--gold)}
@@ -319,7 +320,7 @@ function vGolf() {
   }).join('');
   var body = '';
   if (S.golfTab === 'rank') {
-    var order = [3, 1, 0, 2, 4], heights = [128, 100, 80, 60, 44];
+    var order = [3, 1, 0, 2, 4], heights = [150, 124, 102, 84, 68];
     body = '<div class="podium" role="list" aria-label="Classement">' + order.map(function (idx) {
       var r = rows[idx]; if (!r) return '';
       var pos = r.total != null ? idx + 1 : null;
@@ -329,10 +330,10 @@ function vGolf() {
       return '<div class="pcol" role="listitem"><button type="button" class="pbtn" data-gopen="' + esc(r.nom) + '" aria-label="Résultats de ' + esc(r.nom) + '">' +
         (lead ? '<svg class="crown" width="26" height="18" viewBox="0 0 26 18" aria-hidden="true"><path d="M2 16 4 4l6 6 3-8 3 8 6-6 2 12z" fill="#E9C977"/></svg>' : '') +
         '<span class="av" style="width:' + (lead ? 62 : 52) + 'px;height:' + (lead ? 62 : 52) + 'px;border-width:' + (lead ? 3 : 2) + 'px">' + avInner(r.nom) + '</span>' +
-        '<span class="pname">' + esc(r.nom) + '</span><span class="pscore">' + (r.total != null ? esc(String(r.total).replace('.', ',')) : '—') + '</span></button>' +
-        '<div class="pstep' + (lead ? ' gold' : '') + '" style="height:' + heights[idx] + 'px"><span class="prank">' + (pos || '–') + '</span><span class="dots">' + dots + '</span></div></div>';
+        '<span class="pname">' + esc(r.nom) + '</span></button>' +
+        '<div class="pstep' + (lead ? ' gold' : '') + '" style="height:' + heights[idx] + 'px"><span class="prank">' + (idx + 1) + '</span><span class="dots">' + dots + '</span><span class="pnet">' + (r.total != null ? esc(String(r.total).replace('.', ',')) : '0') + '</span></div></div>';
     }).join('') + '</div>' +
-    '<p class="small" style="margin:2px 0 0;text-align:center">' + (g.majLe ? 'Mis à jour le ' + esc(g.majLe) + '. ' : '') + 'Net cumulé : le plus bas gagne. Touche une photo pour les résultats.</p>';
+    '<p class="small" style="margin:2px 0 0;text-align:center">' + (g.majLe ? 'Mis à jour le ' + esc(g.majLe) + '. ' : '') + 'Chiffre en bas de marche : net cumulé, le plus bas gagne. Touche une photo pour les résultats.</p>';
   } else if (S.golfTab === 'games') {
     body = TEAMS.map(function (t, k) {
       var res = (g.parties || [])[k];
