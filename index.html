@@ -103,8 +103,9 @@ nav.tabs a.on{color:var(--gold2)}
 .rdet button.rr:active{background:rgba(212,175,90,.12)}
 .rdet .rr>span{padding:5px 2px;text-align:center}
 .rdet .h{color:var(--mute);font-size:10px;text-transform:uppercase;min-height:28px}
-.sc{width:100%;border-collapse:collapse;font-size:14px}
-.sc th{position:sticky;top:calc(-1 * env(safe-area-inset-top));z-index:3;background:var(--card);padding-top:8px!important;box-shadow:inset 0 -1px 0 rgba(212,175,90,.45);font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:1px;font-weight:600;padding:8px 4px;border-bottom:1px solid rgba(212,175,90,.3)}
+.sc{width:100%;table-layout:fixed;border-collapse:collapse;font-size:14px}
+.schead{position:-webkit-sticky;position:sticky;top:calc(-1 * env(safe-area-inset-top));z-index:3;background:var(--card);display:grid;grid-template-columns:22% 18% 18% 21% 21%;text-align:center;font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:1px;font-weight:600;padding:8px 0;border-bottom:1px solid rgba(212,175,90,.45)}
+.sc th{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:1px;font-weight:600;padding:8px 4px;border-bottom:1px solid rgba(212,175,90,.3)}
 .sc td{padding:8px 4px;text-align:center;border-bottom:1px solid rgba(159,170,196,.12)}
 .sc tr.sub td{background:rgba(212,175,90,.08);font-weight:700;color:var(--gold2)}
 .sc tr.tot td{background:var(--card2);font-weight:700;font-size:15px;color:var(--gold2);border-bottom:0}
@@ -661,7 +662,7 @@ function scoreCardHtml() {
   return '<div class="ov" role="dialog" aria-label="Carte de score" style="z-index:70"><div class="in">' + header('Carte de score', esc(c.nom)) +
     '<div class="row" style="margin:6px 20px 0;justify-content:space-between"><button type="button" data-act="closeCard" style="min-height:44px;border:0;background:none;color:var(--gold2);font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px;padding:0">' + ic('back', 18, 'currentColor', 2) + 'Golf</button><span class="small" style="font-size:13px">' + golfLabel(k) + '</span></div>' +
     '<section class="sec" style="margin-top:8px"><div class="card" style="flex-direction:row;justify-content:space-between;padding:14px 18px"><div><div class="small">Parcours</div><div style="font-weight:600">' + esc(course.nom || 'À venir') + '</div></div><div style="text-align:right"><div class="small">Handicap du jour</div><div style="font-weight:600;color:var(--gold2)">' + fnum(hcp) + '</div></div></div>' +
-    '<div class="card" style="padding:12px 10px 10px"><table class="sc"><thead><tr><th>Trou</th><th>Par</th><th>Hcp</th><th>Brut</th><th>Net</th></tr></thead><tbody>' + body +
+    '<div class="card" style="padding:12px 10px 10px;gap:0"><div class="schead"><span>Trou</span><span>Par</span><span>Hcp</span><span>Brut</span><span>Net</span></div><table class="sc"><colgroup><col style="width:22%"><col style="width:18%"><col style="width:18%"><col style="width:21%"><col style="width:21%"></colgroup><tbody>' + body +
     '<tr class="tot"><td>Total</td><td>' + (tp || '—') + '</td><td></td><td>' + fnum(brutT) + '</td><td>' + fnum(netT) + '</td></tr></tbody></table></div>' +
     '<p class="small" style="margin:0">Net par trou = brut − coups reçus (points dorés), répartis selon le handicap des trous. Total net = brut − handicap du jour, comme dans le règlement.</p></section></div></div>';
 }
