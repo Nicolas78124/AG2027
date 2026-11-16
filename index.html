@@ -104,7 +104,8 @@ nav.tabs a.on{color:var(--gold2)}
 .rdet .rr>span{padding:5px 2px;text-align:center}
 .rdet .h{color:var(--mute);font-size:10px;text-transform:uppercase;min-height:28px}
 .sc{width:100%;table-layout:fixed;border-collapse:collapse;font-size:14px}
-.schead{position:-webkit-sticky;position:sticky;top:env(safe-area-inset-top,0px);z-index:3;background:var(--card);box-shadow:0 -80px 0 0 var(--bg);display:grid;grid-template-columns:22% 18% 18% 21% 21%;text-align:center;font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:1px;font-weight:600;padding:8px 0;border-bottom:1px solid rgba(212,175,90,.45)}
+.scscroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.schead{flex-shrink:0;display:grid;grid-template-columns:22% 18% 18% 21% 21%;text-align:center;font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:1px;font-weight:600;padding:8px 0;border-bottom:1px solid rgba(212,175,90,.45)}
 .sc th{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:1px;font-weight:600;padding:8px 4px;border-bottom:1px solid rgba(212,175,90,.3)}
 .sc td{padding:8px 4px;text-align:center;border-bottom:1px solid rgba(159,170,196,.12)}
 .sc tr.sub td{background:rgba(212,175,90,.08);font-weight:700;color:var(--gold2)}
@@ -659,12 +660,12 @@ function scoreCardHtml() {
   }
   var brutT = part.brut != null ? part.brut : (nb === 18 ? tb : null);
   var netT = part.net != null ? part.net : (brutT != null && hcp != null ? Math.round((brutT - hcp) * 10) / 10 : null);
-  return '<div class="ov" role="dialog" aria-label="Carte de score" style="z-index:70"><div class="in">' + header('Carte de score', esc(c.nom)) +
+  return '<div class="ov" role="dialog" aria-label="Carte de score" style="z-index:70;overflow:hidden"><div class="in" style="height:100%;display:flex;flex-direction:column;padding-bottom:0">' + header('Carte de score', esc(c.nom)) +
     '<div class="row" style="margin:6px 20px 0;justify-content:space-between"><button type="button" data-act="closeCard" style="min-height:44px;border:0;background:none;color:var(--gold2);font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px;padding:0">' + ic('back', 18, 'currentColor', 2) + 'Golf</button><span class="small" style="font-size:13px">' + golfLabel(k) + '</span></div>' +
-    '<section class="sec" style="margin-top:8px"><div class="card" style="flex-direction:row;justify-content:space-between;padding:14px 18px"><div><div class="small">Parcours</div><div style="font-weight:600">' + esc(course.nom || 'À venir') + '</div></div><div style="text-align:right"><div class="small">Handicap du jour</div><div style="font-weight:600;color:var(--gold2)">' + fnum(hcp) + '</div></div></div>' +
-    '<div class="card" style="padding:12px 10px 10px;gap:0"><div class="schead"><span>Trou</span><span>Par</span><span>Hcp</span><span>Brut</span><span>Net</span></div><table class="sc"><colgroup><col style="width:22%"><col style="width:18%"><col style="width:18%"><col style="width:21%"><col style="width:21%"></colgroup><tbody>' + body +
-    '<tr class="tot"><td>Total</td><td>' + (tp || '—') + '</td><td></td><td>' + fnum(brutT) + '</td><td>' + fnum(netT) + '</td></tr></tbody></table></div>' +
-    '<p class="small" style="margin:0">Net par trou = brut − coups reçus (points dorés), répartis selon le handicap des trous. Total net = brut − handicap du jour, comme dans le règlement.</p></section></div></div>';
+    '<section class="sec" style="margin-top:8px;flex:1;min-height:0;padding-bottom:12px"><div class="card" style="flex-shrink:0;flex-direction:row;justify-content:space-between;padding:14px 18px"><div><div class="small">Parcours</div><div style="font-weight:600">' + esc(course.nom || 'À venir') + '</div></div><div style="text-align:right"><div class="small">Handicap du jour</div><div style="font-weight:600;color:var(--gold2)">' + fnum(hcp) + '</div></div></div>' +
+    '<div class="card" style="padding:12px 10px 0;gap:0;flex:1;min-height:0"><div class="schead"><span>Trou</span><span>Par</span><span>Hcp</span><span>Brut</span><span>Net</span></div><div class="scscroll"><table class="sc"><colgroup><col style="width:22%"><col style="width:18%"><col style="width:18%"><col style="width:21%"><col style="width:21%"></colgroup><tbody>' + body +
+    '<tr class="tot"><td>Total</td><td>' + (tp || '—') + '</td><td></td><td>' + fnum(brutT) + '</td><td>' + fnum(netT) + '</td></tr></tbody></table>' +
+    '<p class="small" style="margin:12px 0 14px">Net par trou = brut − coups reçus (points dorés), répartis selon le handicap des trous. Total net = brut − handicap du jour, comme dans le règlement.</p></div></div></section></div></div>';
 }
 function newDraft() { return { amount: '', cur: lsGet('ag27-cur') === 'MUR' ? 'MUR' : 'EUR', label: '', date: iso(new Date()), payer: S.me || '', shares: NAMES.slice() }; }
 function curRate() { return S.change && +S.change.taux ? +S.change.taux : null; }
