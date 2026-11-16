@@ -331,7 +331,7 @@ function vGolf() {
         (lead ? '<svg class="crown" width="26" height="18" viewBox="0 0 26 18" aria-hidden="true"><path d="M2 16 4 4l6 6 3-8 3 8 6-6 2 12z" fill="#E9C977"/></svg>' : '') +
         '<span class="av" style="width:' + (lead ? 62 : 52) + 'px;height:' + (lead ? 62 : 52) + 'px;border-width:' + (lead ? 3 : 2) + 'px">' + avInner(r.nom) + '</span>' +
         '<span class="pname">' + esc(r.nom) + '</span></button>' +
-        '<div class="pstep' + (lead ? ' gold' : '') + '" style="height:' + heights[idx] + 'px"><span class="prank">' + (idx + 1) + '</span><span class="dots">' + dots + '</span><span class="pnet">' + (r.total != null ? esc(String(r.total).replace('.', ',')) : '0') + '</span></div></div>';
+        '<div class="pstep' + (lead ? ' gold' : '') + '" style="height:' + heights[idx] + 'px"><span class="prank">' + (idx + 1) + '</span><span class="pnet">' + (r.total != null ? esc(String(r.total).replace('.', ',')) : '0') + '</span></div></div>';
     }).join('') + '</div>' +
     '<p class="small" style="margin:2px 0 0;text-align:center">' + (g.majLe ? 'Mis à jour le ' + esc(g.majLe) + '. ' : '') + 'Chiffre en bas de marche : net cumulé, le plus bas gagne. Touche une photo pour les résultats.</p>';
   } else if (S.golfTab === 'games') {
