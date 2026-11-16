@@ -354,7 +354,7 @@ function vGolf() {
   var day = (S.golfTab === 'games' || S.golfTab === 'rules' || nxt > 6 || (g.parties && g.parties.length >= 6)) ? '' :
     '<section class="sec"><div class="card gold" style="border-radius:22px"><div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--script);font-size:30px;line-height:1.1;color:var(--gold2)">' + (isToday ? 'Partie du jour' : 'Prochaine partie') + '</span><span style="font-size:14px;color:var(--soft)">' + golfLabel(nxt - 1) + '</span></div><div class="grid2"><div class="team" style="background:var(--blue)"><span class="k">Équipe Bleue · 3</span><strong>' + t[0] + '</strong></div><div class="team" style="background:var(--red)"><span class="k">Équipe Rouge · 2</span><strong>' + t[1] + '</strong></div></div></div></section>';
   var pdfBtn = '<section class="sec" style="margin-bottom:8px"><button type="button" class="btn ghost" data-act="openTab" style="width:100%"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>Tableau des scores</button></section>';
-  return header('Tournoi officiel', 'Golf') + dbNote() + '<div class="seg" role="tablist">' + segs + '</div><section class="sec" style="gap:8px">' + body + '</section>' + day + pdfBtn;
+  return header('Tournoi officiel', 'Golf') + dbNote() + '<div class="seg" role="tablist">' + segs + '</div><section class="sec" style="gap:8px">' + body + '</section>' + day + (S.golfTab === 'rank' ? pdfBtn : '');
 }
 
 function computeBudget() {
