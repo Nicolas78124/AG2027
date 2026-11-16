@@ -619,6 +619,10 @@ function golfPlayerHtml(nom) {
     if (!(x && x.brut != null)) x = null;
     det += '<button type="button" class="rr" data-card="' + esc(nom) + ':' + p + '" aria-label="Carte de score du ' + GOLF_DAYS[p] + ' janvier"><span style="color:var(--gold2);text-decoration:underline;text-underline-offset:3px">' + GOLF_DAYS[p] + '/01</span>' + (x ? '<span>' + fnum(x.brut) + '/' + fnum(x.hcp) + '</span><span>' + fnum(x.net) + '</span><span>' + (x.bonus ? '−' + fnum(x.bonus) : '—') + '</span><span style="font-weight:600">' + fnum(x.final) + '</span>' : (hcpNext != null ? '<span>—/<span style="color:var(--gold2)">' + esc(String(hcpNext).replace('.', ',')) + '</span></span>' : '<span>—</span>') + '<span>—</span><span>—</span><span>—</span>') + '</button>';
   }
+  var nb = 0, sb = 0, sn = 0;
+  parts.forEach(function (x) { if (x && x.brut != null) { nb++; sb += +x.brut; sn += +(x.net != null ? x.net : x.brut - (x.hcp || 0)); } });
+  var avg = function (v) { return nb ? esc(String(Math.round(v / nb * 10) / 10).replace('.', ',')) : '—'; };
+  det += '<div class="rr" style="border-top:1px solid var(--gold2);font-weight:700"><span style="color:var(--gold2)">Moyenne</span><span>' + avg(sb) + '</span><span>' + avg(sn) + '</span><span></span><span></span></div>';
   det += '</div>';
   return '<div class="modal" data-act="closeGolfBg"><div class="box" role="dialog" aria-labelledby="gpt" style="gap:14px;max-height:88vh;overflow-y:auto"><div class="row" style="justify-content:space-between"><div class="row" style="gap:12px"><span class="av" style="width:52px;height:52px">' + avInner(nom) + '</span><div><div id="gpt" style="font-family:var(--serif);font-size:24px;font-weight:700">' + esc(nom) + '</div><div class="small">Net cumulé : <strong style="color:var(--gold2)">' + (r.total != null ? esc(String(r.total).replace('.', ',')) : '—') + '</strong></div></div></div><button type="button" class="icon-btn" data-act="closeGolf" aria-label="Fermer">' + ic('x', 18, 'currentColor', 2) + '</button></div>' + det +
     '<p class="small" style="margin:0">Touche un jour pour voir la carte des 18 trous.</p></div></div>';
