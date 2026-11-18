@@ -32,7 +32,7 @@ played_any = any(r.get('total') is not None for r in rows.values())
 
 logo = base64.b64encode(open(os.path.join(ROOT, 'logo-sm.png'), 'rb').read()).decode()
 
-head = ''.join(f'<th colspan="3" class="ph">PARTIE {d+1}<small>{DAYS[d]} · {'Île aux Cerfs' if d % 2 == 0 else 'Anahita'}</small></th>' for d in range(6))
+head = ''.join(f'<th colspan="3" class="ph">PARTIE {d+1}<small>{DAYS[d]} · {'Île aux Cerfs' if (d % 2 == 0 or d == 5) else 'Anahita'}</small></th>' for d in range(6))
 sub = ''.join('<th class="s">BRUT<span>/hcp</span></th><th class="s">NET</th><th class="s">BONUS</th>' for _ in range(6))
 body = ''
 for i, n in enumerate(order):

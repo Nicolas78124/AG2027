@@ -183,7 +183,7 @@ var TEAMS = [
 var TEAM_OF = TEAMS.map(function (t) { var m = {}; t[0].split(', ').forEach(function (n) { m[n] = 'b'; }); t[1].split(', ').forEach(function (n) { m[n] = 'r'; }); return m; });
 var DOWS = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'];
 var GOLF_DAYS = [24, 25, 26, 27, 28, 29];
-function courseOf(k) { return k % 2 === 0 ? 'Île aux Cerfs' : 'Anahita'; }
+function courseOf(k) { return (k % 2 === 0 || k === 5) ? 'Île aux Cerfs' : 'Anahita'; }
 function golfLabel(k) { var d = new Date(2027, 0, GOLF_DAYS[k]); var s = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }); return s.charAt(0).toUpperCase() + s.slice(1); }
 
 var IC = {
