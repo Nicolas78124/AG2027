@@ -256,8 +256,8 @@ function dbNote() {
 function vAccueil() {
   var d = Math.round((START - today0()) / 86400000);
   var count = '';
-  if (d > 0) count = '<section class="sec"><div class="card hl" style="flex-direction:row;align-items:center;justify-content:space-between;padding:20px;border-radius:22px"><div style="display:flex;flex-direction:column;gap:4px"><span class="small" style="text-transform:uppercase;letter-spacing:2px">Départ dans</span><span id="cd-days" style="font-size:46px;line-height:1;font-weight:700;color:var(--gold2);font-variant-numeric:tabular-nums lining-nums">' + cdParts().days + ' <span style="font-size:20px;font-weight:500">' + (cdParts().days > 1 ? 'jours' : 'jour') + '</span></span><span id="cd-hms" style="font-size:15px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums">' + cdParts().hms + '</span></div><div style="display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:2px"><span style="font-size:18px;font-weight:600;font-variant-numeric:lining-nums">22 → 31 janv.</span><span class="small">2027 · 9 nuits</span></div></div></section>';
-  else if (d === 0) count = '<section class="sec"><div class="card gold" style="align-items:center;text-align:center;padding:26px 20px;border-radius:22px;gap:6px"><span class="big" style="font-size:76px;color:var(--gold2)">Jour J</span><span>Cap sur l\'île Maurice !</span></div></section>';
+  // Compte à rebours sur une seule ligne, affiché jusqu'au décollage puis supprimé
+  if (Date.now() < TAKEOFF) count = '<section class="sec" id="cd-sec" style="text-align:center"><span id="cd-line" style="display:inline-block;white-space:nowrap;font-size:15px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums lining-nums">' + cdLine() + '</span></section>';
   var players = NAMES.map(function (n) {
     return '<button type="button" class="player" data-person="' + n + '" aria-label="Contacter ' + esc(CONTACTS[n] ? CONTACTS[n].nom : n) + '"><span class="av">' + avInner(n) + '</span><span style="font-size:13px">' + n + '</span></button>';
   }).join('');
@@ -654,10 +654,14 @@ function cdParts() {
   var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
   return { days: days, hms: pad(h) + ' h ' + pad(m) + ' min ' + pad(sec) + ' s' };
 }
+function cdLine() {
+  var c = cdParts();
+  return '<span style="color:var(--mute);font-weight:500">Départ dans </span><span style="color:var(--gold2)">' + c.days + ' j</span> ' + c.hms;
+}
 setInterval(function () {
-  var a = document.getElementById('cd-hms'); if (!a) return;
-  var c = cdParts(); a.textContent = c.hms;
-  var b = document.getElementById('cd-days'); if (b && b.firstChild && +b.firstChild.nodeValue !== c.days) b.firstChild.nodeValue = c.days + ' ';
+  var a = document.getElementById('cd-line'); if (!a) return;
+  if (Date.now() >= TAKEOFF) { var sec = document.getElementById('cd-sec'); if (sec) sec.remove(); return; }
+  a.innerHTML = cdLine();
 }, 1000);
 function parisTime() {
   try { return new Date().toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
