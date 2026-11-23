@@ -525,8 +525,7 @@ function sheetPlan() {
     var r = M.R, eta = new Date(Date.now() + r.time * 1000);
     h += '<div style="display:flex;align-items:baseline;gap:10px"><span style="font-size:28px;font-weight:700;color:#E9C977">' + dur(r.time) + '</span><span style="font-size:15px;color:#C9D0E0">' + km(r.dist) + ' · arrivée ' + hhmm(eta) + '</span></div>' +
       '<button type="button" class="mbtn" data-m="go">' + ic('go', 20, 2) + 'Démarrer le guidage</button>' +
-      '<div style="display:flex;gap:8px"><button type="button" class="mbtn gh" style="flex:1;min-height:44px;font-size:13px" data-m="ext-g">' + ic('ext', 16) + 'Google</button><button type="button" class="mbtn gh" style="flex:1;min-height:44px;font-size:13px" data-m="ext-w">' + ic('ext', 16) + 'Waze</button><button type="button" class="mbtn gh" style="flex:1;min-height:44px;font-size:13px" data-m="ext-a">' + ic('ext', 16) + 'Plans</button></div>' +
-      '<span class="sm">Le guidage AG 2027 marche sans réseau (GPS du téléphone). Google Maps, Waze et Plans demandent du réseau ou leur propre carte hors ligne.</span>';
+      '<span class="sm">Le guidage marche sans réseau, avec le GPS du téléphone.</span>';
   } else if (M.A && M.B) {
     h += '<span class="sm" style="color:#F2A3AC">' + esc(M.routeErr || 'Pas d\'itinéraire trouvé entre ces deux points.') + '</span>';
   } else {
@@ -751,12 +750,6 @@ function simulate(speedKmh) {
   }, 1000);
 }
 
-function extUrl(kind) {
-  var A = M.A, B = M.B, ll = function (p) { return p.lat.toFixed(6) + ',' + p.lon.toFixed(6); };
-  if (kind === 'w') return 'https://waze.com/ul?ll=' + ll(B) + '&navigate=yes';
-  if (kind === 'a') return 'https://maps.apple.com/?' + (A && !A.me ? 'saddr=' + ll(A) + '&' : '') + 'daddr=' + ll(B) + '&dirflg=d';
-  return 'https://www.google.com/maps/dir/?api=1' + (A && !A.me ? '&origin=' + ll(A) : '') + '&destination=' + ll(B) + '&travelmode=driving&dir_action=navigate';
-}
 
 function onClick(ev) {
   var t = ev.target.closest('[data-m],[data-pick]'); if (!t) return;
@@ -773,7 +766,6 @@ function onClick(ev) {
     case 'stop': stopNav(); break;
     case 'voice': M.voice = !M.voice; lsSet('ag27-carte-voix', M.voice ? '1' : '0'); if (!M.voice) try { speechSynthesis.cancel(); } catch (e) {} navUi(); break;
     case 'recenter': if (M.nav) { M.nav.free = false; if (M.nav.last) onPos({ coords: { latitude: M.nav.last[0], longitude: M.nav.last[1], accuracy: 10 } }); } break;
-    case 'ext-g': case 'ext-w': case 'ext-a': window.open(extUrl(a.slice(-1)), '_blank', 'noopener'); break;
   }
 }
 function onInput(ev) {
