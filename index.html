@@ -1124,10 +1124,12 @@ function checkUpdate() {
     }
   });
 }
+var CARTE_V = '2026-11-23-3';
 function openMap(btn) {
   if (window.AGMap) { AGMap.open(); return; }
   if (btn) btn.style.opacity = '.6';
-  var s = document.createElement('script'); s.src = 'carte/carte.js?v=' + encodeURIComponent(S.pageSig || '1');
+  // CARTE_V : à changer à chaque modification de carte/carte.js (déclenche « Mettre à jour l'application »)
+  var s = document.createElement('script'); s.src = 'carte/carte.js?v=' + CARTE_V;
   s.onload = function () { if (btn) btn.style.opacity = ''; AGMap.open(); };
   s.onerror = function () { if (btn) btn.style.opacity = ''; toast('La carte n\'a pas pu se charger. Vérifie ta connexion.'); };
   document.head.appendChild(s);
