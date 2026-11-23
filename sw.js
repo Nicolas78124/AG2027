@@ -1,5 +1,5 @@
 // AG 2027 — mode hors connexion
-const VERSION = 'ag2027-v4';
+const VERSION = 'ag2027-v5';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest',
   'logo.png', 'logo-sm.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'favicon.png',
