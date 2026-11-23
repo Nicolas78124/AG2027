@@ -231,6 +231,9 @@ function cutEdge(g, e, from, to) {
   if (to < from) { var r = []; for (i = out.length - 2; i >= 0; i -= 2) r.push(out[i], out[i + 1]); out = r; }
   return out;
 }
+function niceName(n) { var m = /^(.+?) · (.+)$/.exec(n); return m ? m[2] + ' (' + m[1] + ')' : n; }
+function roadRef(n) { var m = /\(([A-Z]\d+[A-Za-z]?)\)$/.exec(n || '') || /^([A-Z]\d+[A-Za-z]?)$/.exec(n || ''); return m ? m[1] : null; }
+function sameRoad(a, b) { return a === b || (!!roadRef(a) && roadRef(a) === roadRef(b)); }
 function turnWord(d) {
   var a = Math.abs(d), s = d > 0 ? 'droite' : 'gauche';
   if (a < 25) return null;
@@ -243,7 +246,7 @@ function buildRoute(g, legs, A, B, time) {
   var coords = [], cum = [], ctime = [], steps = [], total = 0, ttot = 0;
   var segs = legs.map(function (l) {
     var e = l[0], L = g.elen[e] || 1, len = Math.abs(l[3] - l[2]);
-    return { e: e, pts: cutEdge(g, e, l[2], l[3]), len: len, time: len / L * g.etime[e], name: g.ename[e] >= 0 ? g.names[g.ename[e]] : '', rb: !!(g.eflags[e] & 2), v: l[1] ? g.efrom[e] : g.eto[e] };
+    return { e: e, pts: cutEdge(g, e, l[2], l[3]), len: len, time: len / L * g.etime[e], name: g.ename[e] >= 0 ? niceName(g.names[g.ename[e]]) : '', rb: !!(g.eflags[e] & 2), v: l[1] ? g.efrom[e] : g.eto[e] };
   }).filter(function (s, i, all) { return s.len > 0.5 || all.length === 1; });
   segs.forEach(function (s) {
     for (var i = 0; i < s.pts.length; i += 2) {
@@ -278,11 +281,23 @@ function buildRoute(g, legs, A, B, time) {
       continue;
     }
     if (s.rb) continue;
-    var d = ((headOut(n) - headIn(s) + 540) % 360) - 180;
+    var hin = headIn(s), d = ((headOut(n) - hin + 540) % 360) - 180;
     var tw = turnWord(d), deg = g.deg[s.v];
     if (deg <= 2 && Math.abs(d) < 60) continue; // simple virage de la route
+    if (tw && Math.abs(d) < 60) {
+      // léger virage : on ne l'annonce que si une autre route part plus droit
+      var straighter = false;
+      for (var q = g.arcStart[s.v]; q < g.arcStart[s.v + 1]; q++) {
+        var ar = g.arcs[q]; if ((ar >> 1) === n.e || (ar >> 1) === s.e) continue;
+        var pp = edgePts(g, ar >> 1, ar & 1), m = 2;
+        while (m < pp.length - 2 && dist(pp[0], pp[1], pp[m], pp[m + 1]) < 12) m += 2;
+        var od = ((bearing(pp[0], pp[1], pp[m], pp[m + 1]) - hin + 540) % 360) - 180;
+        if (Math.abs(od) < Math.abs(d) + 10) { straighter = true; break; }
+      }
+      if (!straighter) tw = null;
+    }
     if (tw) steps.push({ at: s.endAt, t: tw.t, txt: tw.txt + (n.name ? ' sur ' + n.name : ''), name: n.name });
-    else if (n.name && n.name !== s.name && deg > 2) steps.push({ at: s.endAt, t: 'straight', txt: 'Continuez sur ' + n.name, name: n.name });
+    else if (n.name && !sameRoad(n.name, s.name) && !sameRoad(n.name, steps[steps.length - 1].name) && deg > 2) steps.push({ at: s.endAt, t: 'straight', txt: 'Continuez sur ' + n.name, name: n.name });
   }
   steps.push({ at: total, t: 'flag', txt: 'Vous êtes arrivé', name: '' });
   var startWalk = A.d, endWalk = B.d;
@@ -500,7 +515,7 @@ function sheetPlan() {
     var p = M[k];
     return '<button type="button" class="fld' + (f === k ? ' on' : '') + '" data-m="field' + k + '"><span class="dot" style="background:' + color + '"></span><span class="lab">' + lab + '</span><span class="val' + (p ? '' : ' ph') + '">' + esc(p ? pointLabel(p) : (k === 'A' ? 'Choisir le départ' : 'Choisir l\'arrivée')) + '</span></button>';
   };
-  var h = '<div style="display:flex;gap:8px;align-items:center"><div style="flex:1;display:flex;flex-direction:column;gap:8px">' + fld('A', 'Départ', '#8FD3A8') + fld('B', 'Arrivée', '#F2A3AC') + '</div>' +
+  var h = '<div style="display:flex;gap:8px;align-items:center"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">' + fld('A', 'Départ', '#8FD3A8') + fld('B', 'Arrivée', '#F2A3AC') + '</div>' +
     '<button type="button" class="rb" data-m="swap" aria-label="Inverser départ et arrivée">' + ic('swap', 20) + '</button></div>';
   if (f) {
     h += '<div class="srch">' + ic('search', 18) + '<input id="msrch" type="search" placeholder="Rechercher un lieu" autocomplete="off" value="' + esc(M.q || '') + '"></div>' +
