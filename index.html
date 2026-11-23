@@ -184,6 +184,7 @@ var TEAMS = [
 var TEAM_OF = TEAMS.map(function (t) { var m = {}; t[0].split(', ').forEach(function (n) { m[n] = 'b'; }); t[1].split(', ').forEach(function (n) { m[n] = 'r'; }); return m; });
 var DOWS = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'];
 var GOLF_DAYS = [24, 25, 26, 27, 28, 29];
+function partieSaisie(p) { return !!(p && (p.gagnant || p.moyBleue != null || p.moyRouge != null)); }
 function courseOf(k) { return (k % 2 === 0 || k === 5) ? 'Île aux Cerfs' : 'Anahita'; }
 function golfLabel(k) { var d = new Date(2027, 0, GOLF_DAYS[k]); var s = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }); return s.charAt(0).toUpperCase() + s.slice(1); }
 
@@ -367,12 +368,15 @@ function vGolf() {
   } else {
     body = '<div class="card" style="font-size:14px;line-height:1.55;color:#DCE1EC;gap:12px"><p style="margin:0"><strong style="color:var(--gold2)">Handicap évolutif.</strong> Partie 1 à l\'index officiel. Ensuite, le handicap du jour = score brut de la veille − par du parcours.</p><p style="margin:0"><strong style="color:var(--gold2)">Équipes.</strong> Chaque jour, une équipe Bleue de 3 contre une Rouge de 2, selon la rotation de l\'onglet Parties. Chacun fait équipe avec chacun.</p><p style="margin:0"><strong style="color:var(--gold2)">Comparaison.</strong> Les équipes sont comparées sur leur moyenne nette. La plus basse gagne la journée.</p><p style="margin:0"><strong style="color:var(--gold2)">Bonus.</strong> L\'écart de moyenne, arrondi au dixième, est déduit du net de chaque gagnant. Égalité parfaite : pas de bonus.</p><p style="margin:0"><strong style="color:var(--gold2)">Classement.</strong> Somme des 6 scores nets ajustés. Le total le plus bas remporte le séjour.</p></div>';
   }
-  var td = today0(), nxt = 1, isToday = false;
-  for (var q = 0; q < 6; q++) { var gd = new Date(2027, 0, GOLF_DAYS[q]); if (td.getTime() === gd.getTime()) { nxt = q + 1; isToday = true; break; } if (td < gd) { nxt = q + 1; break; } nxt = 7; }
+  // Carte « partie » : la 1re partie dont le score n'est pas encore saisi.
+  // Avant 9 h le jour J → « Prochaine partie » ; à partir de 9 h → « Partie en cours » jusqu'à saisie du score.
+  var nxt = 7, enCours = false;
+  for (var q = 0; q < 6; q++) { if (!partieSaisie((g.parties || [])[q])) { nxt = q + 1; break; } }
   if (g.prochainePartie) nxt = g.prochainePartie;
+  if (nxt <= 6) enCours = new Date() >= new Date(2027, 0, GOLF_DAYS[nxt - 1], 9, 0, 0);
   var t = TEAMS[Math.min(5, Math.max(0, nxt - 1))];
-  var day = (S.golfTab !== 'rank' || nxt > 6 || (g.parties && g.parties.length >= 6)) ? '' :
-    '<section class="sec"><div class="card gold" style="border-radius:22px"><div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--script);font-size:30px;line-height:1.1;color:var(--gold2)">' + (isToday ? 'Partie du jour' : 'Prochaine partie') + '</span><span style="font-size:14px;color:var(--soft)">' + golfLabel(nxt - 1) + ' · <b style="color:var(--gold2)">' + courseOf(nxt - 1) + '</b></span></div><div class="grid2"><div class="team" style="background:var(--blue)"><span class="k">Équipe Bleue · 3</span><strong>' + t[0] + '</strong></div><div class="team" style="background:var(--red)"><span class="k">Équipe Rouge · 2</span><strong>' + t[1] + '</strong></div></div></div></section>';
+  var day = (S.golfTab !== 'rank' || nxt > 6) ? '' :
+    '<section class="sec"><div class="card gold" style="border-radius:22px"><div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--script);font-size:30px;line-height:1.1;color:var(--gold2)">' + (enCours ? 'Partie en cours' : 'Prochaine partie') + '</span><span style="font-size:14px;color:var(--soft)">' + golfLabel(nxt - 1) + ' · <b style="color:var(--gold2)">' + courseOf(nxt - 1) + '</b></span></div><div class="grid2"><div class="team" style="background:var(--blue)"><span class="k">Équipe Bleue · 3</span><strong>' + t[0] + '</strong></div><div class="team" style="background:var(--red)"><span class="k">Équipe Rouge · 2</span><strong>' + t[1] + '</strong></div></div></div></section>';
   var pdfBtn = '<section class="sec" style="margin-bottom:8px"><button type="button" class="btn ghost" data-act="openTab" style="width:100%"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>Tableau des scores</button></section>';
   return header('Tournoi officiel', 'Golf') + dbNote() + '<div class="seg" role="tablist">' + segs + '</div><section class="sec" style="gap:8px">' + body + '</section>' + day + (S.golfTab === 'rank' ? pdfBtn : '');
 }
