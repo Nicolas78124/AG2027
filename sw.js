@@ -1,10 +1,10 @@
 // AG 2027 — mode hors connexion
-const VERSION = 'ag2027-v10';
+const VERSION = 'ag2027-v11';
 // Carte hors ligne : cache à part, jamais effacé lors des mises à jour du site
 const CARTE = 'ag2027-carte';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest',
-  'logo.png', 'logo-sm.png', 'plage.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'favicon.png',
+  'logo.png', 'logo-sm.png', 'plage.jpg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'favicon.png',
   'nico.jpg', 'vic.jpg', 'jc.jpg', 'jef.jpg', 'sam.jpg',
   'data/voyage.json', 'data/golf.json', 'data/change.json', 'data/secret.json', 'docs/tableau-des-scores.pdf', 'docs/tableau-des-scores.png'
 ];
