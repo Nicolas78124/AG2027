@@ -1,5 +1,7 @@
 // AG 2027 — mode hors connexion
-const VERSION = 'ag2027-v8';
+const VERSION = 'ag2027-v9';
+// Carte hors ligne : cache à part, jamais effacé lors des mises à jour du site
+const CARTE = 'ag2027-carte';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest',
   'logo.png', 'logo-sm.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'favicon.png',
@@ -13,7 +15,7 @@ self.addEventListener('install', (e) => {
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
+    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION && k !== CARTE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -55,6 +57,22 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const u = new URL(req.url);
+
+  // Carte hors ligne : les gros fichiers (fond de carte, routes) sont gérés par carte.js ;
+  // le reste (bibliothèque, polices, pictogrammes) : réseau d'abord, copie dans le cache de la carte
+  if (u.origin === self.location.origin && u.pathname.includes('/carte/')) {
+    if (/\.(pmtiles|bin)$/.test(u.pathname) || /(lieux|version)\.json$/.test(u.pathname)) {
+      if (/version\.json$/.test(u.pathname) || u.searchParams.has('v')) return; // téléchargement : toujours le réseau
+      e.respondWith(caches.open(CARTE).then((c) => c.match(cacheKey(req))).then((hit) => hit || fetch(req)));
+      return;
+    }
+    e.respondWith((async () => {
+      const c = await caches.open(CARTE);
+      try { const res = await fetch(req); if (res && res.ok) c.put(cacheKey(req), res.clone()); return res; }
+      catch (err) { const hit = await c.match(cacheKey(req)); if (hit) return hit; throw err; }
+    })());
+    return;
+  }
 
   // Vérification de nouvelle version : toujours le réseau, jamais le cache
   if (u.origin === self.location.origin && /index\.html$/.test(u.pathname) && u.searchParams.has('v')) return;

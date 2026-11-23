@@ -1,0 +1,91 @@
+name: Carte hors ligne de Maurice
+
+# Fabrique les données de la carte hors ligne (fond de carte + réseau routier)
+# à partir d'OpenStreetMap, puis les ajoute au site.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/carte/**'
+      - '.github/workflows/carte.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: carte
+  cancel-in-progress: true
+
+jobs:
+  carte:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Outils
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pip install osmium
+          mkdir -p /tmp/pm && cd /tmp/pm
+          gh release download -R protomaps/go-pmtiles -p '*Linux_x86_64.tar.gz'
+          tar xzf *.tar.gz
+          sudo mv pmtiles /usr/local/bin/
+          pmtiles version || true
+
+      - name: Données OpenStreetMap de Maurice
+        run: |
+          curl -fL --retry 3 -o /tmp/maurice.osm.pbf https://download.geofabrik.de/africa/mauritius-latest.osm.pbf
+          ls -lh /tmp/maurice.osm.pbf
+
+      - name: Réseau routier et lieux
+        run: |
+          mkdir -p carte
+          python3 tools/carte/build_routes.py /tmp/maurice.osm.pbf carte
+          ls -lh carte/routes.bin carte/lieux.json
+
+      - name: Fond de carte (vectoriel)
+        run: |
+          SRC=""
+          for i in $(seq 0 14); do
+            D=$(date -u -d "-$i day" +%Y%m%d)
+            if curl -sfI "https://build.protomaps.com/$D.pmtiles" >/dev/null; then SRC="https://build.protomaps.com/$D.pmtiles"; break; fi
+          done
+          test -n "$SRC" || { echo "Aucun fond de carte Protomaps trouvé"; exit 1; }
+          echo "Source : $SRC"
+          # Cloudflare Pages limite chaque fichier à 25 Mo : on baisse le zoom maxi si besoin
+          for Z in 15 14 13; do
+            rm -f carte/maurice.pmtiles
+            pmtiles extract "$SRC" carte/maurice.pmtiles --bbox=57.28,-20.55,57.82,-19.95 --maxzoom=$Z
+            S=$(stat -c %s carte/maurice.pmtiles)
+            echo "zoom $Z : $S octets"
+            if [ "$S" -lt 24000000 ]; then break; fi
+          done
+          test "$(stat -c %s carte/maurice.pmtiles)" -lt 25000000
+          test "$(stat -c %s carte/routes.bin)" -lt 25000000
+          python3 - <<'EOF'
+          import json, os, datetime
+          v = {
+            'date': datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M'),
+            'pmtiles': os.path.getsize('carte/maurice.pmtiles'),
+            'routes': os.path.getsize('carte/routes.bin'),
+            'lieux': os.path.getsize('carte/lieux.json'),
+          }
+          json.dump(v, open('carte/version.json', 'w'))
+          print(v)
+          EOF
+
+      - name: Publication sur le site
+        run: |
+          git config user.name "AG 2027 carte"
+          git config user.email "actions@users.noreply.github.com"
+          git add carte/maurice.pmtiles carte/routes.bin carte/lieux.json carte/version.json
+          git commit -m "Carte hors ligne : données OpenStreetMap du $(date -u +%d/%m/%Y)" || exit 0
+          git pull --rebase
+          git push
