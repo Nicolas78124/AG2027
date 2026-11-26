@@ -135,6 +135,30 @@ nav.tabs a.on{color:var(--gold2);background:linear-gradient(180deg,rgba(255,255,
 .scn b{color:var(--gold2);font-weight:600;letter-spacing:-1px}
 .sc-in:disabled{opacity:1;-webkit-text-fill-color:var(--ink);background:transparent;border-color:transparent}
 .sc-in.bd:disabled{-webkit-text-fill-color:var(--gold2)}
+.dcw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px;border:1px solid rgba(212,175,90,.35);overscroll-behavior-x:contain}
+.dg{border-collapse:separate;border-spacing:0;font-size:13px;font-variant-numeric:tabular-nums lining-nums}
+.dg th,.dg td{padding:0;height:44px;min-width:40px;text-align:center;border-bottom:1px solid rgba(159,170,196,.15);background:var(--card)}
+.dg .l{position:sticky;left:0;z-index:2;min-width:80px;max-width:80px;text-align:left;padding-left:8px;border-right:1px solid rgba(212,175,90,.5);background:var(--card)}
+.dg .r{position:sticky;right:0;z-index:2;min-width:60px;border-left:1px solid rgba(212,175,90,.5);background:var(--card2)}
+.dg thead th{height:24px;font-size:11px;color:var(--mute);font-weight:600}
+.dg thead th span{color:#5A6A8E;font-weight:500}
+.dg .s{background:var(--card2);color:var(--gold2);font-weight:600;min-width:44px}
+.dg tr.gp td{height:24px;font-size:11px;font-weight:600;text-align:left;padding-left:8px;color:var(--ink)}
+.dg tr.gp td.r{text-align:center;padding:0;font-size:11px}
+.dcb{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:44px;border:0;background:none;color:inherit;font:inherit;padding:0}
+.dcb b,.dg td.s b{display:block;font-size:15px;font-weight:600;line-height:1.15}
+.dcb i,.dg td.s i{display:block;font-style:normal;font-size:11px;color:var(--soft);line-height:1.2;min-height:13px}
+.dcb i u{text-decoration:none;color:var(--gold2);letter-spacing:-1px}
+.dcb b.e{color:#5A6A8E}
+.dcb b.bd{color:var(--gold2)}
+.dg td.on{outline:2px solid var(--gold2);outline-offset:-2px;background:var(--card2)}
+.dg td.r b{display:block;font-size:17px;font-weight:800;color:var(--gold2);line-height:1.15}
+.dg td.r i{display:block;font-style:normal;font-size:11px;color:var(--soft)}
+.pad{position:fixed;left:0;right:0;bottom:calc(74px + env(safe-area-inset-bottom));z-index:25;max-width:520px;margin:0 auto;background:var(--card);border-top:1px solid var(--gold);border-radius:18px 18px 0 0;padding:10px 12px 10px;box-shadow:0 -8px 24px rgba(0,0,0,.35)}
+.kp{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:8px}
+.kp button{height:44px;border-radius:10px;border:0;background:var(--card2);color:var(--ink);font:600 18px Inter,system-ui,sans-serif}
+.kp button.g{background:transparent;border:1px solid rgba(212,175,90,.45);color:var(--gold2);font-size:13px}
+.kp button.w3{grid-column:span 3}
 .lockbar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:rgba(212,175,90,.12);border:1px solid var(--gold);color:var(--gold2);font-size:13px;font-weight:600}
 .adm{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;background:var(--bg);text-align:left}
 .team{padding:10px 12px;border-radius:12px;display:flex;flex-direction:column;gap:3px;font-size:14px}
@@ -465,38 +489,65 @@ function dayTeamTxt(k, names) {
   names.forEach(function (nm) { var r = scCalc(k, nm); if (r.cnt) { s += r.total != null ? r.total : r.hn; n++; } if (r.total == null) done = false; });
   return n ? String(Math.round(s / n * 10) / 10).replace('.', ',') + (done && n === names.length ? '' : ' <span style="font-size:11px;font-weight:500;opacity:.8">en cours</span>') : '—';
 }
-function dayGroupHtml(k, names, label, color, holes) {
-  var calc = {}; names.forEach(function (nm) { calc[nm] = scCalc(k, nm); });
-  var w = names.length === 3 ? 'calc((100% - 34%) / 3)' : 'calc((100% - 34%) / 2)';
-  var h = '<div class="card" style="padding:12px 8px 6px;gap:8px"><div class="row" style="justify-content:space-between;padding:0 6px"><span class="team" style="background:' + color + ';padding:6px 12px;font-size:13px;font-weight:600">' + label + '</span><span class="small">Moy. nette <b style="color:var(--gold2)" id="sct-' + k + '-' + names.length + '">' + dayTeamTxt(k, names) + '</b></span></div>' +
-    '<table class="dc"><colgroup><col style="width:11%"><col style="width:10%"><col style="width:13%">' + names.map(function () { return '<col style="width:' + w + '">'; }).join('') + '</colgroup><thead><tr><th>Trou</th><th>Par</th><th>Hcp</th>' + names.map(function (nm) { return '<th class="pn">' + esc(nm) + '</th>'; }).join('') + '</tr>' +
-    '<tr class="hc"><th colspan="3" style="text-align:left;padding-left:6px">Handicap · coups reçus</th>' + names.map(function (nm) { var c = calc[nm]; return '<th>' + (c.hcp != null ? fnum(c.hcp) + ' · ' + c.cr : '—') + '</th>'; }).join('') + '</tr></thead><tbody>';
-  var tp = 0, sp = 0;
-  for (var i = 0; i < 18; i++) {
-    tp += holes[i].par; sp += holes[i].par;
-    h += '<tr><td class="h">' + (i + 1) + '</td><td>' + holes[i].par + '</td><td class="h" style="font-size:12px">' + holes[i].si + '</td>' + names.map(function (nm) {
-      var c = calc[nm], v = scGet(k, nm)[i], has = +v > 0;
-      return '<td><input class="sc-in' + (has && +v < holes[i].par ? ' bd' : '') + '"' + (dayLocked(k) ? ' disabled' : '') + ' data-sc="' + k + ':' + esc(nm) + ':' + i + '" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" enterkeyhint="next" autocomplete="off" aria-label="' + esc(nm) + ', trou ' + (i + 1) + ', score brut" value="' + (has ? +v : '') + '"><span class="scn" id="scn-' + k + '-' + esc(nm) + '-' + i + '">' + scDots(c.st[i]) + (c.net[i] != null ? 'net ' + c.net[i] : '') + '</span></td>';
-    }).join('') + '</tr>';
-    if (i === 8 || i === 17) {
-      var al = i === 8;
-      h += '<tr class="sub"><td colspan="2" style="text-align:left;padding-left:6px">' + (al ? 'Aller' : 'Retour') + '</td><td>' + sp + '</td>' + names.map(function (nm) { var c = calc[nm]; return '<td id="sc' + (al ? 'a' : 'r') + '-' + k + '-' + esc(nm) + '">' + (al ? scSub(c.ab, c.an, c.ac) : scSub(c.rb, c.rn, c.rc)) + '</td>'; }).join('') + '</tr>';
-      sp = 0;
-    }
-  }
-  h += '<tr class="tot"><td colspan="2" style="text-align:left;padding-left:6px">Brut</td><td>' + tp + '</td>' + names.map(function (nm) { var c = calc[nm]; return '<td id="scb-' + k + '-' + esc(nm) + '">' + (c.cnt ? c.brut : '—') + '</td>'; }).join('') + '</tr>';
-  h += '<tr class="tot net"><td colspan="3" style="text-align:left;padding-left:6px">Net</td>' + names.map(function (nm) { return '<td id="scnt-' + k + '-' + esc(nm) + '">' + scNetTxt(calc[nm]) + '</td>'; }).join('') + '</tr>';
-  return h + '</tbody></table></div>';
+function dayGridHtml(k) {
+  var holes = dayHoles(k), t = TEAMS[k], cols = [];
+  for (var i = 0; i < 18; i++) { cols.push(i); if (i === 8) cols.push('A'); if (i === 17) cols.push('R'); }
+  var pd = S.pad && S.pad.k === k ? S.pad : null;
+  var h = '<table class="dg"><thead><tr><th class="l">Trou</th>' + cols.map(function (c) { return c === 'A' ? '<th class="s">Aller</th>' : c === 'R' ? '<th class="s">Retour</th>' : '<th>' + (c + 1) + '</th>'; }).join('') + '<th class="r">Total</th></tr>' +
+    '<tr><th class="l">Par · hcp</th>' + cols.map(function (c) { return c === 'A' ? '<th class="s">37</th>'.replace('37', holes.slice(0, 9).reduce(function (x, y) { return x + y.par; }, 0)) : c === 'R' ? '<th class="s">' + holes.slice(9).reduce(function (x, y) { return x + y.par; }, 0) + '</th>' : '<th>' + holes[c].par + '<span> · ' + holes[c].si + '</span></th>'; }).join('') + '<th class="r">net · brut</th></tr></thead><tbody>';
+  [[t[0].split(', '), 'Partie 1 · Bleue', 'var(--blue)', 3], [t[1].split(', '), 'Partie 2 · Rouge', 'var(--red)', 2]].forEach(function (G) {
+    h += '<tr class="gp"><td class="l" style="background:' + G[2] + '">' + G[1] + '</td><td colspan="' + cols.length + '" style="background:' + G[2] + '"></td><td class="r" style="background:' + G[2] + '">moy. ' + dayTeamTxt(k, G[0]).replace(/ <span[^>]*>en cours<\/span>/, '') + '</td></tr>';
+    G[0].forEach(function (nm) {
+      var c = scCalc(k, nm), a = scGet(k, nm);
+      h += '<tr><td class="l"><div style="font-family:var(--serif);font-size:16px;font-weight:700">' + esc(nm) + '</div><div style="font-size:11px;color:var(--gold2)">' + (c.hcp != null ? fnum(c.hcp) + ' · ' + c.cr + ' cps' : 'hcp —') + '</div></td>' + cols.map(function (q) {
+        if (q === 'A') return '<td class="s"><b>' + (c.ac ? c.ab : '—') + '</b><i>' + (c.ac ? 'net ' + c.an : '') + '</i></td>';
+        if (q === 'R') return '<td class="s"><b>' + (c.rc ? c.rb : '—') + '</b><i>' + (c.rc ? 'net ' + c.rn : '') + '</i></td>';
+        var v = +a[q] > 0 ? +a[q] : null, st = c.st[q], on = pd && pd.nom === nm && pd.i === q;
+        return '<td' + (on ? ' class="on"' : '') + '><button type="button" class="dcb" data-cell="' + k + ':' + esc(nm) + ':' + q + '" aria-label="' + esc(nm) + ', trou ' + (q + 1) + (v ? ', ' + v : ', vide') + '"><b class="' + (v == null ? 'e' : (v < holes[q].par ? 'bd' : '')) + '">' + (v == null ? '·' : v) + '</b><i>' + scDots(st) + (v != null ? c.net[q] : '') + '</i></button></td>';
+      }).join('') + '<td class="r"><b>' + (c.total != null ? fnum(c.total) : (c.cnt ? c.hn : '—')) + '</b><i>' + (c.cnt ? 'brut ' + c.brut + (c.cnt < 18 ? ' · ' + c.cnt + ' t.' : '') : '') + '</i></td></tr>';
+    });
+  });
+  return h + '</tbody></table>';
+}
+function padHtml() {
+  var P = S.pad; if (!P) return '';
+  var hp = dayHoles(P.k)[P.i], st = scCalc(P.k, P.nom).st[P.i], keys = '';
+  for (var n = 1; n <= 9; n++) keys += '<button type="button" data-key="' + n + '">' + (n === 9 ? '9+' : n) + '</button>';
+  keys += '<button type="button" class="g w3" data-key="del">Effacer</button><button type="button" class="g w3" data-key="prev">← Préc.</button><button type="button" class="g w3" data-key="next">Suiv. →</button>';
+  return '<div class="pad" role="dialog" aria-label="Saisie du score"><div class="row" style="justify-content:space-between;gap:8px;font-size:14px"><span><b style="color:var(--gold2)">' + esc(P.nom) + '</b> · trou ' + (P.i + 1) + ' · par ' + hp.par + ' · ' + (st > 0 ? st + ' coup' + (st > 1 ? 's' : '') + ' reçu' + (st > 1 ? 's' : '') : 'aucun coup reçu') + '</span><button type="button" class="icon-btn" data-key="close" aria-label="Fermer le pavé" style="min-height:36px;min-width:36px">' + ic('x', 16, 'currentColor', 2) + '</button></div><div class="kp">' + keys + '</div></div>';
 }
 function dayCardHtml(k) {
-  var holes = dayHoles(k), t = TEAMS[k];
   var days = '<div class="days" role="tablist" aria-label="Jour de golf">' + GOLF_DAYS.map(function (d, i) { return '<button type="button" data-sday="' + i + '" class="' + (i === k ? 'on' : '') + '">' + d + '/01<small>' + (courseOf(i) === 'Anahita' ? 'Anahita' : 'Cerfs') + '</small></button>'; }).join('') + '</div>';
-  var top = '<div class="card gold" style="flex-direction:row;justify-content:space-between;align-items:center;padding:14px 18px"><div><div style="font-family:var(--script);font-size:26px;line-height:1.1;color:var(--gold2)">Carte du jour</div><div class="small" style="font-size:13px">' + golfLabel(k) + '</div></div><div style="text-align:right"><div style="font-family:var(--serif);font-size:19px;font-weight:700;color:var(--gold2)">' + courseOf(k) + '</div><div class="small">Par 72</div></div></div>';
+  var top = '<div class="row" style="justify-content:space-between;align-items:baseline;padding:0 4px"><span style="font-family:var(--serif);font-size:21px;font-weight:700;color:var(--gold2)">' + courseOf(k) + '</span><span class="small" style="font-size:12px">' + golfLabel(k) + ' · par 72</span></div>';
   var lock = dayLocked(k) ? '<div class="lockbar">' + ic('lock', 18, 'currentColor', 2) + 'Carte validée par l\'admin : les scores ne peuvent plus être modifiés.</div>' : '';
-  return days + top + lock +
-    dayGroupHtml(k, t[0].split(', '), '1re partie · Bleue · 3', 'var(--blue)', holes) +
-    dayGroupHtml(k, t[1].split(', '), '2e partie · Rouge · 2', 'var(--red)', holes) +
-    '<p class="small" style="margin:2px 0 0;text-align:center">Saisis le score brut de chaque trou au fil de la partie : tout le groupe voit la carte se remplir. Points dorés = coups reçus sur le trou. Net final = brut − handicap du jour, comme au règlement.</p>';
+  return days + top + lock + '<div class="dcw" id="dcw">' + dayGridHtml(k) + '</div>' +
+    '<p class="small" style="margin:2px 0 0;text-align:center">' + (dayLocked(k) ? '' : 'Touche une case pour saisir le score brut : le pavé passe au joueur suivant de la même partie. ') + 'Points dorés = coups reçus. Total : net en gras (brut − handicap du jour), brut dessous.</p>' +
+    (S.pad && S.pad.k === k ? '<div style="height:210px" aria-hidden="true"></div>' + padHtml() : '');
+}
+function padMove(dir) {
+  var P = S.pad, team = TEAMS[P.k][TEAM_OF[P.k][P.nom] === 'b' ? 0 : 1].split(', '), j = team.indexOf(P.nom) + dir, i = P.i;
+  if (j >= team.length) { j = 0; i++; } else if (j < 0) { j = team.length - 1; i--; }
+  if (i > 17) { S.pad = null; return; }
+  if (i < 0) return;
+  P.nom = team[j]; P.i = i;
+}
+function padKey(key) {
+  var P = S.pad; if (!P) return;
+  if (key === 'close') { S.pad = null; render(); return; }
+  if (key === 'next' || key === 'prev') { padMove(key === 'next' ? 1 : -1); padShow(); return; }
+  if (dayLocked(P.k)) { toast('Carte verrouillée par l\'admin.'); S.pad = null; render(); return; }
+  var k = P.k, nom = P.nom, i = P.i, cellKey = k + '-' + nom, arr = scGet(k, nom).slice();
+  while (arr.length < 18) arr.push(null);
+  arr[i] = key === 'del' ? null : +key;
+  SC.local[cellKey] = arr; SC.dirty[cellKey] = true; scPersist();
+  clearTimeout(SC.timers[cellKey]); SC.timers[cellKey] = setTimeout(function () { scSave(cellKey); }, 700);
+  if (key !== 'del') padMove(1);
+  padShow();
+}
+function padShow() {
+  render();
+  var on = document.querySelector('.dg td.on');
+  if (on) { var w = document.getElementById('dcw'), l = w.querySelector('td.l'), r = w.querySelector('td.r'); var lw = l ? l.offsetWidth : 80, rw = r ? r.offsetWidth : 60; var x = on.offsetLeft; if (x - lw < w.scrollLeft) w.scrollLeft = x - lw; else if (x + on.offsetWidth > w.scrollLeft + w.clientWidth - rw) w.scrollLeft = x + on.offsetWidth - w.clientWidth + rw; }
 }
 function scUpdate(k, nom) {
   var c = scCalc(k, nom), id = k + '-' + nom, el;
@@ -532,7 +583,7 @@ function scSave(key) {
 }
 function setLock(k, on) {
   var prev = !!SC.locks[k];
-  SC.locks[k] = on; render(); renderLayer();
+  SC.locks[k] = on; if (on && S.pad && S.pad.k === k) S.pad = null; render(); renderLayer();
   SB.req('POST', '/rest/v1/medias', { id: 'lock-' + k, data: { lock: true, p: k, locked: on, by: 'admin', at: Date.now() }, updated_at: new Date().toISOString() }, { 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' }).then(function () {
     toast((on ? 'Carte du ' : 'Carte déverrouillée : ') + GOLF_DAYS[k] + '/01' + (on ? ' verrouillée.' : '.'));
   }, function (e) { SC.locks[k] = prev; render(); renderLayer(); if (e && e.code === 'invalid_argument') onWriteError(e); else toast('Pas de réseau : réessaie dans un instant.'); });
@@ -966,7 +1017,9 @@ function render() {
   if (scBusy()) { SC.pending = true; scRefreshShown(); return; }
   var v = S.view;
   var html = v === 'voyage' ? vVoyage() : v === 'widgets' ? vWidgets() : v === 'golf' ? vGolf() : v === 'budget' ? vBudget() : v === 'medias' ? vMedias() : vAccueil();
+  var dw = document.getElementById('dcw'), dsx = dw ? dw.scrollLeft : null;
   document.getElementById('app').innerHTML = html;
+  if (dsx != null) { var dw2 = document.getElementById('dcw'); if (dw2) dw2.scrollLeft = dsx; }
   var tabs = [['accueil', 'home', 'Accueil'], ['voyage', 'voyage', 'Voyage'], ['widgets', 'widgets', 'Widgets'], ['golf', 'golf', 'Golf'], ['budget', 'budget', 'Budget'], ['medias', 'medias', 'Médias']];
   document.getElementById('tabs').innerHTML = tabs.map(function (t) { return '<a href="#' + t[0] + '" class="' + (v === t[0] ? 'on' : '') + '"' + (v === t[0] ? ' aria-current="page"' : '') + '>' + ic(t[1]) + t[2] + '</a>'; }).join('');
   if (!S.sheet) renderLayer();
@@ -978,7 +1031,7 @@ function route() {
   S.view = ['voyage', 'widgets', 'golf', 'budget', 'medias'].indexOf(h) >= 0 ? h : 'accueil';
   if (window.AGMap) AGMap.close();
   if (S.view === 'accueil') checkUpdate();
-  S.detail = false; S.trash = false; S.card = null; S.conv = false; S.plug = false; S.wx = false; S.spritz = false; S.agent = false; S.person = null; S.admin = null; S.adminOk = false; S.clock = false; S.golfOpen = null; S.tab = false; S.carte = null; S.sheet = null; S.lightbox = null; S.confirm = null;
+  S.detail = false; S.trash = false; S.card = null; S.conv = false; S.plug = false; S.wx = false; S.spritz = false; S.agent = false; S.person = null; S.admin = null; S.adminOk = false; S.pad = null; S.clock = false; S.golfOpen = null; S.tab = false; S.carte = null; S.sheet = null; S.lightbox = null; S.confirm = null;
   render(); window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);
@@ -988,10 +1041,12 @@ document.addEventListener('click', function (ev) {
   if (scBusy() && !(ev.target.closest && ev.target.closest('.sc-in'))) document.activeElement.blur();
   var t = ev.target.closest('button, [data-act]'); if (!t) return;
   if (t.hasAttribute('data-lock') && S.adminOk) { var lk = +t.getAttribute('data-lock'); setLock(lk, !dayLocked(lk)); return; }
-  if (t.hasAttribute('data-sday')) { S.golfDay = +t.getAttribute('data-sday'); render(); return; }
+  if (t.hasAttribute('data-sday')) { S.golfDay = +t.getAttribute('data-sday'); S.pad = null; render(); return; }
+  if (t.hasAttribute('data-cell')) { var cc = t.getAttribute('data-cell').split(':'); if (dayLocked(+cc[0])) { toast('Carte verrouillée par l\'admin.'); return; } S.pad = { k: +cc[0], nom: cc[1], i: +cc[2] }; padShow(); return; }
+  if (t.hasAttribute('data-key')) { padKey(t.getAttribute('data-key')); return; }
   var a = t.getAttribute('data-act');
   if (t.hasAttribute('data-carte')) { S.carte = t.getAttribute('data-carte'); renderLayer(); var cp = CARTES[S.carte]; loadPdf('docs/cartes/' + cp.pdf, 'Carte de score ' + cp.nom + '.pdf'); return; }
-  if (t.hasAttribute('data-gtab')) { S.golfTab = t.getAttribute('data-gtab'); render(); if (S.golfTab === 'day') { loadCol('medias'); scFlush(); } return; }
+  if (t.hasAttribute('data-gtab')) { S.golfTab = t.getAttribute('data-gtab'); S.pad = null; render(); if (S.golfTab === 'day') { loadCol('medias'); scFlush(); } return; }
   if (t.hasAttribute('data-quickmur')) { var m = document.getElementById('cv-mur'); if (m) { m.value = t.getAttribute('data-quickmur'); convFrom('mur'); } return; }
   if (t.hasAttribute('data-copy')) {
     var txt = t.getAttribute('data-copy');

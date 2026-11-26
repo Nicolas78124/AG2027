@@ -1,5 +1,5 @@
 // AG 2027 — mode hors connexion
-const VERSION = 'ag2027-v16';
+const VERSION = 'ag2027-v17';
 // Carte hors ligne : cache à part, jamais effacé lors des mises à jour du site
 const CARTE = 'ag2027-carte';
 const SHELL = [
