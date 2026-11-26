@@ -504,7 +504,7 @@ function dayGridHtml(k) {
         if (q === 'R') return '<td class="s"><b>' + (c.rc ? c.rb : '—') + '</b><i>' + (c.rc ? 'net ' + c.rn : '') + '</i></td>';
         var v = +a[q] > 0 ? +a[q] : null, st = c.st[q], on = pd && pd.nom === nm && pd.i === q;
         return '<td' + (on ? ' class="on"' : '') + '><button type="button" class="dcb" data-cell="' + k + ':' + esc(nm) + ':' + q + '" aria-label="' + esc(nm) + ', trou ' + (q + 1) + (v ? ', ' + v : ', vide') + '"><b class="' + (v == null ? 'e' : (v < holes[q].par ? 'bd' : '')) + '">' + (v == null ? '·' : v) + '</b><i>' + scDots(st) + (v != null ? c.net[q] : '') + '</i></button></td>';
-      }).join('') + '<td class="r"><b>' + (c.total != null ? fnum(c.total) : (c.cnt ? c.hn : '—')) + '</b><i>' + (c.cnt ? 'brut ' + c.brut + (c.cnt < 18 ? ' · ' + c.cnt + ' t.' : '') : '') + '</i></td></tr>';
+      }).join('') + '<td class="r"><b>' + (c.total != null ? fnum(c.total) : (c.cnt ? c.hn : '—')) + '</b><i>' + (c.cnt ? 'brut ' + c.brut : '') + '</i></td></tr>';
     });
   });
   return h + '</tbody></table>';
