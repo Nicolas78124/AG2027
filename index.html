@@ -114,6 +114,25 @@ nav.tabs a.on{color:var(--gold2);background:linear-gradient(180deg,rgba(255,255,
 .sc .u{display:inline-flex;min-width:28px;height:28px;align-items:center;justify-content:center;border-radius:50%}
 .sc .u.bd{border:1.5px solid var(--gold2);color:var(--gold2)}
 .sc .u.bg{border:1px solid rgba(159,170,196,.5);border-radius:6px}
+.seg.g5 button{font-size:12px;padding:0 2px;white-space:nowrap}
+.days{display:flex;gap:6px;overflow-x:auto;padding:2px 0 4px;-webkit-overflow-scrolling:touch}
+.days button{flex:1 0 auto;min-height:40px;padding:0 10px;border-radius:10px;border:1px solid rgba(212,175,90,.35);background:var(--card);color:var(--soft);font-size:13px;font-weight:600;line-height:1.1}
+.days button.on{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+.days button small{display:block;font-size:10px;font-weight:500;opacity:.85}
+.dc{width:100%;table-layout:fixed;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums lining-nums}
+.dc th,.dc td{padding:5px 2px;text-align:center;border-bottom:1px solid rgba(159,170,196,.12)}
+.dc thead th{font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.dc thead th.pn{font-size:14px;color:var(--ink);text-transform:none;letter-spacing:0;font-family:var(--serif);font-weight:700}
+.dc thead tr.hc th{color:var(--gold2);font-size:11px;text-transform:none;letter-spacing:0;border-bottom:1px solid rgba(212,175,90,.45)}
+.dc td.h{color:var(--mute)}
+.dc tr.sub td{background:rgba(212,175,90,.08);font-weight:700;color:var(--gold2);font-size:12px}
+.dc tr.tot td{background:var(--card2);font-weight:700;font-size:14px;color:var(--gold2)}
+.dc tr.tot.net td{font-size:16px;border-bottom:0}
+.sc-in{width:100%;max-width:50px;height:36px;border-radius:10px;border:1px solid rgba(212,175,90,.35);background:var(--card2);color:var(--ink);text-align:center;font:600 17px Inter,system-ui,sans-serif;padding:0;-moz-appearance:textfield}
+.sc-in:focus{outline:2px solid var(--gold2);outline-offset:0;border-color:var(--gold2)}
+.sc-in.bd{color:var(--gold2);border-color:var(--gold2)}
+.scn{display:block;font-size:11px;color:var(--soft);margin-top:2px;min-height:13px}
+.scn b{color:var(--gold2);font-weight:600;letter-spacing:-1px}
 .team{padding:10px 12px;border-radius:12px;display:flex;flex-direction:column;gap:3px;font-size:14px}
 .team .k{font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.85}
 /* budget */
@@ -335,7 +354,7 @@ function vGolf() {
   var hasData = rows.length > 0;
   if (!hasData) rows = NAMES.map(function (n) { return { nom: n, total: null, parties: [] }; });
   rows.sort(function (a, b) { if (a.total == null) return 1; if (b.total == null) return -1; return a.total - b.total; });
-  var segs = [['rank', 'Classement'], ['games', 'Parties'], ['rules', 'Règlement'], ['map', 'Carte']].map(function (s) {
+  var segs = [['rank', 'Classement'], ['games', 'Parties'], ['rules', 'Règlement'], ['map', 'Trou'], ['day', 'Jour']].map(function (s) {
     return '<button type="button" data-gtab="' + s[0] + '" class="' + (S.golfTab === s[0] ? 'on' : '') + '">' + s[1] + '</button>';
   }).join('');
   var body = '';
@@ -360,6 +379,8 @@ function vGolf() {
       var tdy = today0().getTime() === new Date(2027, 0, GOLF_DAYS[k]).getTime();
       return '<div class="card' + (tdy ? ' halo' : '') + '" style="gap:8px;padding:14px"><div class="row" style="justify-content:space-between"><span style="font-family:var(--serif);font-size:20px;font-weight:700;color:var(--gold2)">' + golfLabel(k) + (tdy ? ' <span style="font-family:Inter,sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase">· aujourd\'hui</span>' : '') + '</span><span class="small" style="color:var(--gold2);font-weight:600">' + esc(res && res.golf ? res.golf : courseOf(k)) + '</span></div><div class="row" style="gap:8px;align-items:stretch"><div class="team grow" style="background:var(--blue)"><span class="k">Bleue · 3' + (res && res.moyBleue != null ? ' · moy. ' + esc(res.moyBleue) : '') + '</span>' + t[0] + '</div><div class="team grow" style="background:var(--red)"><span class="k">Rouge · 2' + (res && res.moyRouge != null ? ' · moy. ' + esc(res.moyRouge) : '') + '</span>' + t[1] + '</div></div>' + (res && res.gagnant ? '<span class="small">Victoire ' + esc(res.gagnant) + (res.bonus ? ' · bonus ' + esc(res.bonus) : '') + '</span>' : '') + '</div>';
     }).join('');
+  } else if (S.golfTab === 'day') {
+    body = dayCardHtml(S.golfDay != null ? S.golfDay : defaultGolfDay());
   } else if (S.golfTab === 'map') {
     body = Object.keys(CARTES).map(function (k) {
       var c = CARTES[k];
@@ -378,7 +399,138 @@ function vGolf() {
   var day = (S.golfTab !== 'rank' || nxt > 6) ? '' :
     '<section class="sec"><div class="card gold" style="border-radius:22px"><div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--script);font-size:30px;line-height:1.1;color:var(--gold2)">' + (enCours ? 'Partie en cours' : 'Prochaine partie') + '</span><span style="font-size:14px;color:var(--soft)">' + golfLabel(nxt - 1) + ' · <b style="color:var(--gold2)">' + courseOf(nxt - 1) + '</b></span></div><div class="grid2"><div class="team" style="background:var(--blue)"><span class="k">Équipe Bleue · 3</span><strong>' + t[0] + '</strong></div><div class="team" style="background:var(--red)"><span class="k">Équipe Rouge · 2</span><strong>' + t[1] + '</strong></div></div></div></section>';
   var pdfBtn = '<section class="sec" style="margin-bottom:8px"><button type="button" class="btn ghost" data-act="openTab" style="width:100%"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>Tableau des scores</button></section>';
-  return header('Tournoi officiel', 'Golf') + dbNote() + '<div class="seg" role="tablist">' + segs + '</div><section class="sec" style="gap:8px">' + body + '</section>' + day + (S.golfTab === 'rank' ? pdfBtn : '');
+  return header('Tournoi officiel', 'Golf') + dbNote() + '<div class="seg g5" role="tablist">' + segs + '</div><section class="sec" style="gap:8px">' + body + '</section>' + day + (S.golfTab === 'rank' ? pdfBtn : '');
+}
+
+/* ---------- carte du jour (saisie des scores trou par trou) ---------- */
+var HOLES = {
+  'Île aux Cerfs': { par: [4, 4, 3, 5, 4, 5, 4, 3, 5, 4, 5, 4, 3, 4, 3, 4, 4, 4], si: [3, 8, 12, 10, 9, 6, 14, 18, 4, 7, 2, 5, 11, 17, 13, 15, 16, 1] },
+  'Anahita': { par: [4, 5, 4, 5, 3, 4, 4, 3, 4, 4, 4, 3, 5, 4, 4, 4, 3, 5], si: [11, 15, 1, 9, 13, 3, 7, 5, 17, 12, 6, 16, 18, 8, 2, 4, 14, 10] }
+};
+function dayHoles(k) {
+  var g = S.golf || {}, t = ((g.parcours || [])[k] || {}).trous || [], d = HOLES[courseOf(k)], out = [];
+  for (var i = 0; i < 18; i++) { var h = t[i] || {}; out.push({ par: +h.par || d.par[i], si: +h.si || d.si[i] }); }
+  return out;
+}
+var SC = { local: {}, remote: {}, dirty: {}, timers: {}, pending: false, warned: 0 };
+try { var _sc = JSON.parse(lsGet('ag27-sc') || '{}') || {}; SC.local = _sc.local || {}; SC.dirty = _sc.dirty || {}; } catch (e) {}
+function scPersist() { lsSet('ag27-sc', JSON.stringify({ local: SC.local, dirty: SC.dirty })); }
+function scGet(k, nom) { var key = k + '-' + nom; return (SC.dirty[key] ? SC.local[key] : (SC.remote[key] || SC.local[key])) || []; }
+function scBusy() { var a = document.activeElement; return !!(a && a.classList && a.classList.contains('sc-in')); }
+function defaultGolfDay() {
+  var t = today0().getTime();
+  for (var i = 0; i < 6; i++) if (t === new Date(2027, 0, GOLF_DAYS[i]).getTime()) return i;
+  var g = S.golf || {};
+  if (g.prochainePartie) return Math.max(0, Math.min(5, g.prochainePartie - 1));
+  for (var q = 0; q < 6; q++) if (!partieSaisie((g.parties || [])[q])) return q;
+  return 5;
+}
+// Handicap du jour : celui du classement s'il est saisi, sinon index (partie 1), sinon brut de la veille − par
+function dayHcp(k, nom) {
+  var g = S.golf || {}, row = (g.classement || []).filter(function (r) { return r.nom === nom; })[0] || {}, parts = row.parties || [];
+  if (parts[k] && parts[k].hcp != null) return +parts[k].hcp;
+  if (k === 0) return g.index && g.index[nom] != null ? +g.index[nom] : null;
+  if (g.hcpJour && g.hcpJourDate === '2027-01-' + pad(GOLF_DAYS[k]) && g.hcpJour[nom] != null) return +g.hcpJour[nom];
+  var pv = parts[k - 1];
+  if (pv && pv.brut != null) return +pv.brut - (pv.par != null ? +pv.par : 72);
+  var a = scGet(k - 1, nom), h = dayHoles(k - 1), b = 0, p = 0;
+  for (var i = 0; i < 18; i++) { if (!(+a[i] > 0)) return null; b += +a[i]; p += h[i].par; }
+  return b - p;
+}
+function scCalc(k, nom) {
+  var holes = dayHoles(k), a = scGet(k, nom), hcp = dayHcp(k, nom), r = { hcp: hcp, cr: hcp != null ? Math.round(hcp) : null, st: [], net: [], ab: 0, an: 0, ac: 0, rb: 0, rn: 0, rc: 0 };
+  for (var i = 0; i < 18; i++) {
+    var st = hcp != null ? strokesOn(hcp, holes[i].si) : 0, b = +a[i] > 0 ? +a[i] : null;
+    r.st.push(st); r.net.push(b != null ? b - st : null);
+    if (b != null) { if (i < 9) { r.ab += b; r.an += b - st; r.ac++; } else { r.rb += b; r.rn += b - st; r.rc++; } }
+  }
+  r.cnt = r.ac + r.rc; r.brut = r.ab + r.rb; r.hn = r.an + r.rn;
+  r.total = r.cnt === 18 && hcp != null ? Math.round((r.brut - hcp) * 10) / 10 : null;
+  return r;
+}
+function scSub(b, n, c) { return c ? b + '<span style="color:var(--soft);font-weight:500"> / ' + n + '</span>' : '—'; }
+function scDots(st) { return st > 0 ? '<b>' + '•'.repeat(Math.min(st, 3)) + '</b> ' : (st < 0 ? '<b>+' + (-st) + '</b> ' : ''); }
+function scNetTxt(r) { return r.total != null ? fnum(r.total) : (r.cnt ? r.hn + '<span style="font-size:11px;color:var(--soft);font-weight:500"> (' + r.cnt + ' t.)</span>' : '—'); }
+function dayTeamTxt(k, names) {
+  var s = 0, n = 0, done = true;
+  names.forEach(function (nm) { var r = scCalc(k, nm); if (r.cnt) { s += r.total != null ? r.total : r.hn; n++; } if (r.total == null) done = false; });
+  return n ? String(Math.round(s / n * 10) / 10).replace('.', ',') + (done && n === names.length ? '' : ' <span style="font-size:11px;font-weight:500;opacity:.8">en cours</span>') : '—';
+}
+function dayGroupHtml(k, names, label, color, holes) {
+  var calc = {}; names.forEach(function (nm) { calc[nm] = scCalc(k, nm); });
+  var w = names.length === 3 ? 'calc((100% - 34%) / 3)' : 'calc((100% - 34%) / 2)';
+  var h = '<div class="card" style="padding:12px 8px 6px;gap:8px"><div class="row" style="justify-content:space-between;padding:0 6px"><span class="team" style="background:' + color + ';padding:6px 12px;font-size:13px;font-weight:600">' + label + '</span><span class="small">Moy. nette <b style="color:var(--gold2)" id="sct-' + k + '-' + names.length + '">' + dayTeamTxt(k, names) + '</b></span></div>' +
+    '<table class="dc"><colgroup><col style="width:11%"><col style="width:10%"><col style="width:13%">' + names.map(function () { return '<col style="width:' + w + '">'; }).join('') + '</colgroup><thead><tr><th>Trou</th><th>Par</th><th>Hcp</th>' + names.map(function (nm) { return '<th class="pn">' + esc(nm) + '</th>'; }).join('') + '</tr>' +
+    '<tr class="hc"><th colspan="3" style="text-align:left;padding-left:6px">Handicap · coups reçus</th>' + names.map(function (nm) { var c = calc[nm]; return '<th>' + (c.hcp != null ? fnum(c.hcp) + ' · ' + c.cr : '—') + '</th>'; }).join('') + '</tr></thead><tbody>';
+  var tp = 0, sp = 0;
+  for (var i = 0; i < 18; i++) {
+    tp += holes[i].par; sp += holes[i].par;
+    h += '<tr><td class="h">' + (i + 1) + '</td><td>' + holes[i].par + '</td><td class="h" style="font-size:12px">' + holes[i].si + '</td>' + names.map(function (nm) {
+      var c = calc[nm], v = scGet(k, nm)[i], has = +v > 0;
+      return '<td><input class="sc-in' + (has && +v < holes[i].par ? ' bd' : '') + '" data-sc="' + k + ':' + esc(nm) + ':' + i + '" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" enterkeyhint="next" autocomplete="off" aria-label="' + esc(nm) + ', trou ' + (i + 1) + ', score brut" value="' + (has ? +v : '') + '"><span class="scn" id="scn-' + k + '-' + esc(nm) + '-' + i + '">' + scDots(c.st[i]) + (c.net[i] != null ? 'net ' + c.net[i] : '') + '</span></td>';
+    }).join('') + '</tr>';
+    if (i === 8 || i === 17) {
+      var al = i === 8;
+      h += '<tr class="sub"><td colspan="2" style="text-align:left;padding-left:6px">' + (al ? 'Aller' : 'Retour') + '</td><td>' + sp + '</td>' + names.map(function (nm) { var c = calc[nm]; return '<td id="sc' + (al ? 'a' : 'r') + '-' + k + '-' + esc(nm) + '">' + (al ? scSub(c.ab, c.an, c.ac) : scSub(c.rb, c.rn, c.rc)) + '</td>'; }).join('') + '</tr>';
+      sp = 0;
+    }
+  }
+  h += '<tr class="tot"><td colspan="2" style="text-align:left;padding-left:6px">Brut</td><td>' + tp + '</td>' + names.map(function (nm) { var c = calc[nm]; return '<td id="scb-' + k + '-' + esc(nm) + '">' + (c.cnt ? c.brut : '—') + '</td>'; }).join('') + '</tr>';
+  h += '<tr class="tot net"><td colspan="3" style="text-align:left;padding-left:6px">Net</td>' + names.map(function (nm) { return '<td id="scnt-' + k + '-' + esc(nm) + '">' + scNetTxt(calc[nm]) + '</td>'; }).join('') + '</tr>';
+  return h + '</tbody></table></div>';
+}
+function dayCardHtml(k) {
+  var holes = dayHoles(k), t = TEAMS[k];
+  var days = '<div class="days" role="tablist" aria-label="Jour de golf">' + GOLF_DAYS.map(function (d, i) { return '<button type="button" data-sday="' + i + '" class="' + (i === k ? 'on' : '') + '">' + d + '/01<small>' + (courseOf(i) === 'Anahita' ? 'Anahita' : 'Cerfs') + '</small></button>'; }).join('') + '</div>';
+  var top = '<div class="card gold" style="flex-direction:row;justify-content:space-between;align-items:center;padding:14px 18px"><div><div style="font-family:var(--script);font-size:26px;line-height:1.1;color:var(--gold2)">Carte du jour</div><div class="small" style="font-size:13px">' + golfLabel(k) + '</div></div><div style="text-align:right"><div style="font-family:var(--serif);font-size:19px;font-weight:700;color:var(--gold2)">' + courseOf(k) + '</div><div class="small">Par 72</div></div></div>';
+  return days + top +
+    dayGroupHtml(k, t[0].split(', '), '1re partie · Bleue · 3', 'var(--blue)', holes) +
+    dayGroupHtml(k, t[1].split(', '), '2e partie · Rouge · 2', 'var(--red)', holes) +
+    '<p class="small" style="margin:2px 0 0;text-align:center">Saisis le score brut de chaque trou au fil de la partie : tout le groupe voit la carte se remplir. Points dorés = coups reçus sur le trou. Net final = brut − handicap du jour, comme au règlement.</p>';
+}
+function scUpdate(k, nom) {
+  var c = scCalc(k, nom), id = k + '-' + nom, el;
+  for (var i = 0; i < 18; i++) { el = document.getElementById('scn-' + id + '-' + i); if (el) el.innerHTML = scDots(c.st[i]) + (c.net[i] != null ? 'net ' + c.net[i] : ''); }
+  if ((el = document.getElementById('sca-' + id))) el.innerHTML = scSub(c.ab, c.an, c.ac);
+  if ((el = document.getElementById('scr-' + id))) el.innerHTML = scSub(c.rb, c.rn, c.rc);
+  if ((el = document.getElementById('scb-' + id))) el.innerHTML = c.cnt ? c.brut : '—';
+  if ((el = document.getElementById('scnt-' + id))) el.innerHTML = scNetTxt(c);
+  var t = TEAMS[k];
+  [t[0].split(', '), t[1].split(', ')].forEach(function (names) { var e2 = document.getElementById('sct-' + k + '-' + names.length); if (e2) e2.innerHTML = dayTeamTxt(k, names); });
+}
+// Mise à jour sans tout redessiner pendant la saisie (le champ actif garde le focus)
+function scRefreshShown() {
+  document.querySelectorAll('.sc-in').forEach(function (inp) {
+    var p = inp.getAttribute('data-sc').split(':');
+    if (inp !== document.activeElement) { var v = scGet(+p[0], p[1])[+p[2]]; inp.value = +v > 0 ? +v : ''; }
+  });
+  var k = S.golfDay != null ? S.golfDay : defaultGolfDay();
+  NAMES.forEach(function (nm) { scUpdate(k, nm); });
+}
+function scSave(key) {
+  var i = key.indexOf('-'), k = +key.slice(0, i), nom = key.slice(i + 1), arr = (SC.local[key] || []).slice();
+  var data = { score: true, p: k, nom: nom, trous: arr, by: S.me || '', at: Date.now() };
+  return SB.req('POST', '/rest/v1/medias', { id: 'score-' + key, data: data, updated_at: new Date().toISOString() }, { 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' }).then(function () {
+    SC.remote[key] = arr;
+    if (JSON.stringify(SC.local[key] || []) === JSON.stringify(arr)) delete SC.dirty[key];
+    scPersist();
+  }, function (e) {
+    if (e && e.code === 'invalid_argument') { onWriteError(e); return; }
+    if (Date.now() - SC.warned > 60000) { SC.warned = Date.now(); toast('Score gardé sur ce téléphone, envoyé dès que le réseau revient.'); }
+  });
+}
+function scFlush() { Object.keys(SC.dirty).forEach(function (key) { scSave(key); }); }
+function scInput(inp) {
+  var p = inp.getAttribute('data-sc').split(':'), k = +p[0], nom = p[1], i = +p[2], key = k + '-' + nom;
+  var digits = inp.value.replace(/\D/g, '').slice(0, 2); if (digits !== inp.value) inp.value = digits;
+  var v = parseInt(digits, 10), arr = scGet(k, nom).slice();
+  while (arr.length < 18) arr.push(null);
+  arr[i] = v > 0 ? v : null;
+  SC.local[key] = arr; SC.dirty[key] = true; scPersist();
+  inp.classList.toggle('bd', v > 0 && v < dayHoles(k)[i].par);
+  scUpdate(k, nom);
+  // les handicaps du lendemain dépendent de cette carte
+  clearTimeout(SC.timers[key]); SC.timers[key] = setTimeout(function () { scSave(key); }, 700);
 }
 
 var PDF_CACHE = {};
@@ -774,6 +926,7 @@ function sheetHtml() {
 
 /* ---------- render ---------- */
 function render() {
+  if (scBusy()) { SC.pending = true; scRefreshShown(); return; }
   var v = S.view;
   var html = v === 'voyage' ? vVoyage() : v === 'widgets' ? vWidgets() : v === 'golf' ? vGolf() : v === 'budget' ? vBudget() : v === 'medias' ? vMedias() : vAccueil();
   document.getElementById('app').innerHTML = html;
@@ -795,10 +948,12 @@ window.addEventListener('hashchange', route);
 
 /* ---------- events ---------- */
 document.addEventListener('click', function (ev) {
+  if (scBusy() && !(ev.target.closest && ev.target.closest('.sc-in'))) document.activeElement.blur();
   var t = ev.target.closest('button, [data-act]'); if (!t) return;
+  if (t.hasAttribute('data-sday')) { S.golfDay = +t.getAttribute('data-sday'); render(); return; }
   var a = t.getAttribute('data-act');
   if (t.hasAttribute('data-carte')) { S.carte = t.getAttribute('data-carte'); renderLayer(); var cp = CARTES[S.carte]; loadPdf('docs/cartes/' + cp.pdf, 'Carte de score ' + cp.nom + '.pdf'); return; }
-  if (t.hasAttribute('data-gtab')) { S.golfTab = t.getAttribute('data-gtab'); render(); return; }
+  if (t.hasAttribute('data-gtab')) { S.golfTab = t.getAttribute('data-gtab'); render(); if (S.golfTab === 'day') { loadCol('medias'); scFlush(); } return; }
   if (t.hasAttribute('data-quickmur')) { var m = document.getElementById('cv-mur'); if (m) { m.value = t.getAttribute('data-quickmur'); convFrom('mur'); } return; }
   if (t.hasAttribute('data-copy')) {
     var txt = t.getAttribute('data-copy');
@@ -871,6 +1026,7 @@ function convFrom(src) {
   b.value = r.toLocaleString('fr-FR', { minimumFractionDigits: src === 'eur' ? 0 : 2, maximumFractionDigits: src === 'eur' ? 0 : 2 });
 }
 document.addEventListener('input', function (ev) {
+  if (ev.target.classList && ev.target.classList.contains('sc-in')) { scInput(ev.target); return; }
   var cv = ev.target.getAttribute && ev.target.getAttribute('data-conv');
   if (cv) { convFrom(cv); return; }
   var f = ev.target.getAttribute && ev.target.getAttribute('data-f');
@@ -885,6 +1041,16 @@ document.addEventListener('submit', function (ev) {
   var sh = S.sheet; if (!sh || !stepValid(sh.step, sh.draft)) return;
   if (sh.step < 5) { sh.step++; renderLayer(); return; }
   saveExpense(sh);
+});
+document.addEventListener('focusout', function (ev) {
+  if (!(ev.target.classList && ev.target.classList.contains('sc-in'))) return;
+  setTimeout(function () { if (SC.pending && !scBusy()) { SC.pending = false; render(); } }, 120);
+});
+document.addEventListener('keydown', function (ev) {
+  if (ev.key !== 'Enter' || !(ev.target.classList && ev.target.classList.contains('sc-in'))) return;
+  ev.preventDefault();
+  var all = Array.prototype.slice.call(document.querySelectorAll('.sc-in')), n = all[all.indexOf(ev.target) + 1];
+  if (n) n.focus(); else ev.target.blur();
 });
 document.addEventListener('change', function (ev) {
   if (ev.target.id === 'up') { uploadFiles(ev.target.files); ev.target.value = ''; }
@@ -1062,6 +1228,7 @@ function loadCol(col) {
       S.expTrash = all.filter(function (e) { return e.deleted; }).sort(function (a, b) { return b.deletedAt - a.deletedAt; });
       S.expenses = all.filter(function (e) { return !e.deleted; });
     } else {
+      SC.remote = {}; rows.forEach(function (r) { if (/^score-\d-/.test(r.id) && r.data && Array.isArray(r.data.trous)) SC.remote[r.id.slice(6)] = r.data.trous; });
       var med = rows.map(function (r) { return mapMed(r.id, r.data || {}); }).filter(function (m) { return /^[A-Za-z0-9_.-]+$/.test(m.assetId); }).sort(function (a, b) { return b.createdAt - a.createdAt; });
       S.medTrash = med.filter(function (m) { return m.deleted; }).sort(function (a, b) { return b.deletedAt - a.deletedAt; });
       S.medias = med.filter(function (m) { return !m.deleted; });
@@ -1107,7 +1274,7 @@ function unlock(code) {
   });
 }
 S.offline = !navigator.onLine;
-window.addEventListener('online', function () { S.offline = false; render(); loadCol('expenses'); loadCol('medias'); loadWeather(); loadRate(); });
+window.addEventListener('online', function () { S.offline = false; scFlush(); render(); loadCol('expenses'); loadCol('medias'); loadWeather(); loadRate(); });
 window.addEventListener('offline', function () { S.offline = true; render(); });
 if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
 // Nouvelle version du site : empreinte complète de index.html, comparée à celle du chargement
