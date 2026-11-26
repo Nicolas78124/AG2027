@@ -133,6 +133,10 @@ nav.tabs a.on{color:var(--gold2);background:linear-gradient(180deg,rgba(255,255,
 .sc-in.bd{color:var(--gold2);border-color:var(--gold2)}
 .scn{display:block;font-size:11px;color:var(--soft);margin-top:2px;min-height:13px}
 .scn b{color:var(--gold2);font-weight:600;letter-spacing:-1px}
+.sc-in:disabled{opacity:1;-webkit-text-fill-color:var(--ink);background:transparent;border-color:transparent}
+.sc-in.bd:disabled{-webkit-text-fill-color:var(--gold2)}
+.lockbar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:rgba(212,175,90,.12);border:1px solid var(--gold);color:var(--gold2);font-size:13px;font-weight:600}
+.adm{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;background:var(--bg);text-align:left}
 .team{padding:10px 12px;border-radius:12px;display:flex;flex-direction:column;gap:3px;font-size:14px}
 .team .k{font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.85}
 /* budget */
@@ -221,6 +225,8 @@ var IC = {
   arrow: '<path d="M4 12h15M14 7l5 5-5 5"/>', trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   up: '<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>', cloud: '<path d="M7 18h10a4 4 0 0 0 0-8 6 6 0 0 0-11.5 1.5A3.3 3.3 0 0 0 7 18z"/>',
   down: '<path d="M12 4v11M7 10l5 5 5-5M4 20h16"/>',
+  lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  unlock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/>',
   cam: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'
 };
 function ic(name, size, color, sw) {
@@ -354,7 +360,7 @@ function vGolf() {
   var hasData = rows.length > 0;
   if (!hasData) rows = NAMES.map(function (n) { return { nom: n, total: null, parties: [] }; });
   rows.sort(function (a, b) { if (a.total == null) return 1; if (b.total == null) return -1; return a.total - b.total; });
-  var segs = [['rank', 'Classement'], ['games', 'Parties'], ['rules', 'Règlement'], ['map', 'Trou'], ['day', 'Jour']].map(function (s) {
+  var segs = [['rank', 'Classement'], ['games', 'Parties'], ['rules', 'Règlement'], ['map', 'Trou'], ['day', 'Carte']].map(function (s) {
     return '<button type="button" data-gtab="' + s[0] + '" class="' + (S.golfTab === s[0] ? 'on' : '') + '">' + s[1] + '</button>';
   }).join('');
   var body = '';
@@ -412,7 +418,10 @@ function dayHoles(k) {
   for (var i = 0; i < 18; i++) { var h = t[i] || {}; out.push({ par: +h.par || d.par[i], si: +h.si || d.si[i] }); }
   return out;
 }
-var SC = { local: {}, remote: {}, dirty: {}, timers: {}, pending: false, warned: 0 };
+var SC = { local: {}, remote: {}, dirty: {}, timers: {}, pending: false, warned: 0, locks: {} };
+var ADMIN_CODE = '17';
+function dayLocked(k) { return !!SC.locks[k]; }
+function dayComplete(k) { var n = 0; NAMES.forEach(function (nm) { if (scCalc(k, nm).cnt === 18) n++; }); return n; }
 try { var _sc = JSON.parse(lsGet('ag27-sc') || '{}') || {}; SC.local = _sc.local || {}; SC.dirty = _sc.dirty || {}; } catch (e) {}
 function scPersist() { lsSet('ag27-sc', JSON.stringify({ local: SC.local, dirty: SC.dirty })); }
 function scGet(k, nom) { var key = k + '-' + nom; return (SC.dirty[key] ? SC.local[key] : (SC.remote[key] || SC.local[key])) || []; }
@@ -467,7 +476,7 @@ function dayGroupHtml(k, names, label, color, holes) {
     tp += holes[i].par; sp += holes[i].par;
     h += '<tr><td class="h">' + (i + 1) + '</td><td>' + holes[i].par + '</td><td class="h" style="font-size:12px">' + holes[i].si + '</td>' + names.map(function (nm) {
       var c = calc[nm], v = scGet(k, nm)[i], has = +v > 0;
-      return '<td><input class="sc-in' + (has && +v < holes[i].par ? ' bd' : '') + '" data-sc="' + k + ':' + esc(nm) + ':' + i + '" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" enterkeyhint="next" autocomplete="off" aria-label="' + esc(nm) + ', trou ' + (i + 1) + ', score brut" value="' + (has ? +v : '') + '"><span class="scn" id="scn-' + k + '-' + esc(nm) + '-' + i + '">' + scDots(c.st[i]) + (c.net[i] != null ? 'net ' + c.net[i] : '') + '</span></td>';
+      return '<td><input class="sc-in' + (has && +v < holes[i].par ? ' bd' : '') + '"' + (dayLocked(k) ? ' disabled' : '') + ' data-sc="' + k + ':' + esc(nm) + ':' + i + '" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" enterkeyhint="next" autocomplete="off" aria-label="' + esc(nm) + ', trou ' + (i + 1) + ', score brut" value="' + (has ? +v : '') + '"><span class="scn" id="scn-' + k + '-' + esc(nm) + '-' + i + '">' + scDots(c.st[i]) + (c.net[i] != null ? 'net ' + c.net[i] : '') + '</span></td>';
     }).join('') + '</tr>';
     if (i === 8 || i === 17) {
       var al = i === 8;
@@ -483,7 +492,8 @@ function dayCardHtml(k) {
   var holes = dayHoles(k), t = TEAMS[k];
   var days = '<div class="days" role="tablist" aria-label="Jour de golf">' + GOLF_DAYS.map(function (d, i) { return '<button type="button" data-sday="' + i + '" class="' + (i === k ? 'on' : '') + '">' + d + '/01<small>' + (courseOf(i) === 'Anahita' ? 'Anahita' : 'Cerfs') + '</small></button>'; }).join('') + '</div>';
   var top = '<div class="card gold" style="flex-direction:row;justify-content:space-between;align-items:center;padding:14px 18px"><div><div style="font-family:var(--script);font-size:26px;line-height:1.1;color:var(--gold2)">Carte du jour</div><div class="small" style="font-size:13px">' + golfLabel(k) + '</div></div><div style="text-align:right"><div style="font-family:var(--serif);font-size:19px;font-weight:700;color:var(--gold2)">' + courseOf(k) + '</div><div class="small">Par 72</div></div></div>';
-  return days + top +
+  var lock = dayLocked(k) ? '<div class="lockbar">' + ic('lock', 18, 'currentColor', 2) + 'Carte validée par l\'admin : les scores ne peuvent plus être modifiés.</div>' : '';
+  return days + top + lock +
     dayGroupHtml(k, t[0].split(', '), '1re partie · Bleue · 3', 'var(--blue)', holes) +
     dayGroupHtml(k, t[1].split(', '), '2e partie · Rouge · 2', 'var(--red)', holes) +
     '<p class="small" style="margin:2px 0 0;text-align:center">Saisis le score brut de chaque trou au fil de la partie : tout le groupe voit la carte se remplir. Points dorés = coups reçus sur le trou. Net final = brut − handicap du jour, comme au règlement.</p>';
@@ -509,6 +519,7 @@ function scRefreshShown() {
 }
 function scSave(key) {
   var i = key.indexOf('-'), k = +key.slice(0, i), nom = key.slice(i + 1), arr = (SC.local[key] || []).slice();
+  if (dayLocked(k)) { delete SC.dirty[key]; scPersist(); return Promise.resolve(); }
   var data = { score: true, p: k, nom: nom, trous: arr, by: S.me || '', at: Date.now() };
   return SB.req('POST', '/rest/v1/medias', { id: 'score-' + key, data: data, updated_at: new Date().toISOString() }, { 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' }).then(function () {
     SC.remote[key] = arr;
@@ -519,9 +530,33 @@ function scSave(key) {
     if (Date.now() - SC.warned > 60000) { SC.warned = Date.now(); toast('Score gardé sur ce téléphone, envoyé dès que le réseau revient.'); }
   });
 }
+function setLock(k, on) {
+  var prev = !!SC.locks[k];
+  SC.locks[k] = on; render(); renderLayer();
+  SB.req('POST', '/rest/v1/medias', { id: 'lock-' + k, data: { lock: true, p: k, locked: on, by: 'admin', at: Date.now() }, updated_at: new Date().toISOString() }, { 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' }).then(function () {
+    toast((on ? 'Carte du ' : 'Carte déverrouillée : ') + GOLF_DAYS[k] + '/01' + (on ? ' verrouillée.' : '.'));
+  }, function (e) { SC.locks[k] = prev; render(); renderLayer(); if (e && e.code === 'invalid_argument') onWriteError(e); else toast('Pas de réseau : réessaie dans un instant.'); });
+}
+function adminHtml() {
+  var A = S.admin, body;
+  if (A.step === 'code') {
+    body = '<span id="admt" style="font-family:var(--serif);font-size:26px;font-weight:700">Admin</span><span class="small" style="font-size:14px">Saisis le code administrateur.</span>' +
+      '<form id="adminForm" style="display:flex;flex-direction:column;gap:12px;width:100%"><input id="adminCode" class="field" type="password" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="Code administrateur" style="text-align:center;font-size:24px;letter-spacing:6px">' +
+      (A.err ? '<span style="color:var(--neg);font-size:13px">Code incorrect.</span>' : '') + '<button type="submit" class="btn">Valider</button></form>';
+  } else {
+    body = '<span id="admt" style="font-family:var(--serif);font-size:26px;font-weight:700">Validation des cartes</span><span class="small" style="font-size:13px;line-height:1.45">Verrouille une carte une fois la journée terminée : elle reste visible par tous, mais plus personne ne peut changer les scores.</span>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;width:100%">' + GOLF_DAYS.map(function (d, k) {
+        var on = dayLocked(k), n = dayComplete(k);
+        return '<div class="adm"><div><div style="font-weight:600">' + golfLabel(k) + '</div><div class="small">' + courseOf(k) + ' · ' + n + '/5 cartes complètes</div></div>' +
+          '<button type="button" class="pill" data-lock="' + k + '" aria-pressed="' + on + '" style="min-height:40px;display:flex;align-items:center;gap:6px;white-space:nowrap' + (on ? ';background:var(--gold);color:var(--bg);border-color:var(--gold)' : '') + '">' + ic(on ? 'lock' : 'unlock', 16, 'currentColor', 2) + (on ? 'Verrouillée' : 'Ouverte') + '</button></div>';
+      }).join('') + '</div><span class="small" style="font-size:12px">Touche un bouton pour verrouiller ou déverrouiller.</span>';
+  }
+  return '<div class="modal" data-act="closeAdminBg" style="z-index:80"><div class="box" role="dialog" aria-labelledby="admt" style="align-items:center;text-align:center;gap:14px;position:relative;max-height:88vh;overflow-y:auto"><button type="button" class="icon-btn" data-act="closeAdmin" aria-label="Fermer" style="position:absolute;top:14px;right:14px">' + ic('x', 18, 'currentColor', 2) + '</button>' + body + '</div></div>';
+}
 function scFlush() { Object.keys(SC.dirty).forEach(function (key) { scSave(key); }); }
 function scInput(inp) {
   var p = inp.getAttribute('data-sc').split(':'), k = +p[0], nom = p[1], i = +p[2], key = k + '-' + nom;
+  if (dayLocked(k)) { var ov = scGet(k, nom)[i]; inp.value = +ov > 0 ? +ov : ''; inp.blur(); toast('Carte verrouillée par l\'admin.'); return; }
   var digits = inp.value.replace(/\D/g, '').slice(0, 2); if (digits !== inp.value) inp.value = digits;
   var v = parseInt(digits, 10), arr = scGet(k, nom).slice();
   while (arr.length < 18) arr.push(null);
@@ -674,7 +709,7 @@ function renderLayer() {
       '<div style="display:flex;flex-direction:column;gap:8px;font-size:15px;width:100%">' +
       '<div class="row" style="justify-content:space-between;gap:8px;padding:8px 12px;border-radius:12px;background:var(--bg)"><span>' + esc(P.tel) + '</span><button type="button" class="pill" data-copy="' + esc(P.tel) + '" style="min-height:34px">Copier</button></div>' +
       '<div class="row" style="justify-content:space-between;gap:8px;padding:8px 12px;border-radius:12px;background:var(--bg)"><span style="color:var(--soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(P.mail) + '</span><button type="button" class="pill" data-copy="' + esc(P.mail) + '" style="min-height:34px">Copier</button></div></div>' +
-      '<div class="row" style="gap:22px;justify-content:center;margin-top:6px">' + act('tel:' + num, 'Appeler', svgTel) + act('mailto:' + P.mail, 'E-mail', svgMail) + act('https://wa.me/' + wa, 'WhatsApp', svgWa, true) + '</div></div></div>';
+      '<div class="row" style="gap:22px;justify-content:center;margin-top:6px">' + act('tel:' + num, 'Appeler', svgTel) + act('mailto:' + P.mail, 'E-mail', svgMail) + act('https://wa.me/' + wa, 'WhatsApp', svgWa, true) + '</div>' + (S.person === 'Nico' ? '<button type="button" class="pill" data-act="adminOpen" style="min-height:34px;font-size:12px;display:flex;align-items:center;gap:6px;margin-top:2px">' + ic('lock', 14, 'currentColor', 2) + 'Admin</button>' : '') + '</div></div>';
   }
   if (S.clock) {
     var df = tzDiff();
@@ -725,8 +760,10 @@ function renderLayer() {
   if (S.confirm) {
     h += '<div class="modal"><div class="box" role="alertdialog" aria-labelledby="cft"><span id="cft" style="font-family:var(--serif);font-size:26px;font-weight:700">' + esc(S.confirm.title) + '</span><span style="font-size:14px;color:var(--soft);line-height:1.5">' + esc(S.confirm.text) + '</span><div class="row" style="gap:10px"><button type="button" class="btn ghost grow" data-act="cfNo">Annuler</button><button type="button" class="btn grow" style="background:#B83A48;color:#fff" data-act="cfYes">Supprimer</button></div></div></div>';
   }
+  if (S.admin) h += adminHtml();
   L.innerHTML = h;
-  document.body.style.overflow = (S.detail || S.trash || S.sheet || S.lightbox || S.card || S.conv || S.plug || S.wx || S.spritz || S.agent || S.person || S.clock || S.golfOpen || S.tab || S.carte) ? 'hidden' : '';
+  if (S.admin && S.admin.step === 'code') setTimeout(function () { var ai = document.getElementById('adminCode'); if (ai) ai.focus(); }, 30);
+  document.body.style.overflow = (S.detail || S.trash || S.sheet || S.lightbox || S.card || S.conv || S.plug || S.wx || S.spritz || S.agent || S.person || S.clock || S.golfOpen || S.tab || S.carte || S.admin) ? 'hidden' : '';
   if (S.sheet) { var f = L.querySelector('[data-autofocus]'); if (f) setTimeout(function () { try { f.focus(); } catch (e) {} }, 30); }
 }
 
@@ -941,7 +978,7 @@ function route() {
   S.view = ['voyage', 'widgets', 'golf', 'budget', 'medias'].indexOf(h) >= 0 ? h : 'accueil';
   if (window.AGMap) AGMap.close();
   if (S.view === 'accueil') checkUpdate();
-  S.detail = false; S.trash = false; S.card = null; S.conv = false; S.plug = false; S.wx = false; S.spritz = false; S.agent = false; S.person = null; S.clock = false; S.golfOpen = null; S.tab = false; S.carte = null; S.sheet = null; S.lightbox = null; S.confirm = null;
+  S.detail = false; S.trash = false; S.card = null; S.conv = false; S.plug = false; S.wx = false; S.spritz = false; S.agent = false; S.person = null; S.admin = null; S.clock = false; S.golfOpen = null; S.tab = false; S.carte = null; S.sheet = null; S.lightbox = null; S.confirm = null;
   render(); window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);
@@ -950,6 +987,7 @@ window.addEventListener('hashchange', route);
 document.addEventListener('click', function (ev) {
   if (scBusy() && !(ev.target.closest && ev.target.closest('.sc-in'))) document.activeElement.blur();
   var t = ev.target.closest('button, [data-act]'); if (!t) return;
+  if (t.hasAttribute('data-lock') && S.adminOk) { var lk = +t.getAttribute('data-lock'); setLock(lk, !dayLocked(lk)); return; }
   if (t.hasAttribute('data-sday')) { S.golfDay = +t.getAttribute('data-sday'); render(); return; }
   var a = t.getAttribute('data-act');
   if (t.hasAttribute('data-carte')) { S.carte = t.getAttribute('data-carte'); renderLayer(); var cp = CARTES[S.carte]; loadPdf('docs/cartes/' + cp.pdf, 'Carte de score ' + cp.nom + '.pdf'); return; }
@@ -993,6 +1031,9 @@ document.addEventListener('click', function (ev) {
     case 'closeSpritz': S.spritz = false; renderLayer(); break;
     case 'closeSpritzBg': if (ev.target === t) { S.spritz = false; renderLayer(); } break;
     case 'closePerson': S.person = null; renderLayer(); break;
+    case 'adminOpen': S.person = null; S.admin = { step: S.adminOk ? 'panel' : 'code' }; renderLayer(); break;
+    case 'closeAdmin': S.admin = null; renderLayer(); break;
+    case 'closeAdminBg': if (ev.target === t) { S.admin = null; renderLayer(); } break;
     case 'closePersonBg': if (ev.target === t) { S.person = null; renderLayer(); } break;
     case 'openClock': S.clock = true; renderLayer(); tickClocks(); break;
     case 'openTab': S.tab = true; renderLayer(); loadPdf(); break;
@@ -1036,6 +1077,11 @@ document.addEventListener('input', function (ev) {
   var b = document.getElementById('nextBtn'); if (b) b.disabled = !stepValid(S.sheet.step, S.sheet.draft);
 });
 document.addEventListener('submit', function (ev) {
+  if (ev.target.id === 'adminForm') {
+    ev.preventDefault();
+    if (document.getElementById('adminCode').value.trim() === ADMIN_CODE) { S.adminOk = true; S.admin = { step: 'panel' }; loadCol('medias'); } else S.admin = { step: 'code', err: true };
+    renderLayer(); return;
+  }
   if (ev.target.id !== 'sheetForm') return;
   ev.preventDefault();
   var sh = S.sheet; if (!sh || !stepValid(sh.step, sh.draft)) return;
@@ -1228,7 +1274,7 @@ function loadCol(col) {
       S.expTrash = all.filter(function (e) { return e.deleted; }).sort(function (a, b) { return b.deletedAt - a.deletedAt; });
       S.expenses = all.filter(function (e) { return !e.deleted; });
     } else {
-      SC.remote = {}; rows.forEach(function (r) { if (/^score-\d-/.test(r.id) && r.data && Array.isArray(r.data.trous)) SC.remote[r.id.slice(6)] = r.data.trous; });
+      SC.remote = {}; SC.locks = {}; rows.forEach(function (r) { if (/^score-\d-/.test(r.id) && r.data && Array.isArray(r.data.trous)) SC.remote[r.id.slice(6)] = r.data.trous; if (/^lock-\d$/.test(r.id) && r.data && r.data.locked === true) SC.locks[+r.id.slice(5)] = true; });
       var med = rows.map(function (r) { return mapMed(r.id, r.data || {}); }).filter(function (m) { return /^[A-Za-z0-9_.-]+$/.test(m.assetId); }).sort(function (a, b) { return b.createdAt - a.createdAt; });
       S.medTrash = med.filter(function (m) { return m.deleted; }).sort(function (a, b) { return b.deletedAt - a.deletedAt; });
       S.medias = med.filter(function (m) { return !m.deleted; });
@@ -1290,7 +1336,7 @@ function checkUpdate() {
   pageVersion().then(function (v) {
     if (v && S.pageSig && v !== S.pageSig) {
       S.update = true;
-      var busy = (window.AGMap && AGMap.isOpen()) || S.sheet || S.detail || S.trash || S.card || S.conv || S.plug || S.wx || S.spritz || S.agent || S.person || S.clock || S.lightbox || S.confirm;
+      var busy = (window.AGMap && AGMap.isOpen()) || S.sheet || S.detail || S.trash || S.card || S.conv || S.plug || S.wx || S.spritz || S.agent || S.person || S.clock || S.lightbox || S.confirm || S.admin;
       if (S.view === 'accueil' && !busy) render();
     }
   });
