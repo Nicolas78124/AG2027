@@ -541,7 +541,12 @@ function padKey(key) {
   arr[i] = key === 'del' ? null : +key;
   SC.local[cellKey] = arr; SC.dirty[cellKey] = true; scPersist();
   clearTimeout(SC.timers[cellKey]); SC.timers[cellKey] = setTimeout(function () { scSave(cellKey); }, 700);
-  if (key !== 'del') padMove(1);
+  if (key !== 'del') {
+    var team = TEAMS[k][TEAM_OF[k][nom] === 'b' ? 0 : 1].split(', ');
+    // dernier joueur de la partie sur ce trou : le pavé se ferme
+    if (team.indexOf(nom) === team.length - 1) { S.pad = null; render(); return; }
+    padMove(1);
+  }
   padShow();
 }
 function padShow() {
