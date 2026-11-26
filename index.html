@@ -978,7 +978,7 @@ function route() {
   S.view = ['voyage', 'widgets', 'golf', 'budget', 'medias'].indexOf(h) >= 0 ? h : 'accueil';
   if (window.AGMap) AGMap.close();
   if (S.view === 'accueil') checkUpdate();
-  S.detail = false; S.trash = false; S.card = null; S.conv = false; S.plug = false; S.wx = false; S.spritz = false; S.agent = false; S.person = null; S.admin = null; S.clock = false; S.golfOpen = null; S.tab = false; S.carte = null; S.sheet = null; S.lightbox = null; S.confirm = null;
+  S.detail = false; S.trash = false; S.card = null; S.conv = false; S.plug = false; S.wx = false; S.spritz = false; S.agent = false; S.person = null; S.admin = null; S.adminOk = false; S.clock = false; S.golfOpen = null; S.tab = false; S.carte = null; S.sheet = null; S.lightbox = null; S.confirm = null;
   render(); window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);
@@ -1031,9 +1031,9 @@ document.addEventListener('click', function (ev) {
     case 'closeSpritz': S.spritz = false; renderLayer(); break;
     case 'closeSpritzBg': if (ev.target === t) { S.spritz = false; renderLayer(); } break;
     case 'closePerson': S.person = null; renderLayer(); break;
-    case 'adminOpen': S.person = null; S.admin = { step: S.adminOk ? 'panel' : 'code' }; renderLayer(); break;
-    case 'closeAdmin': S.admin = null; renderLayer(); break;
-    case 'closeAdminBg': if (ev.target === t) { S.admin = null; renderLayer(); } break;
+    case 'adminOpen': S.person = null; S.adminOk = false; S.admin = { step: 'code' }; renderLayer(); break;
+    case 'closeAdmin': S.admin = null; S.adminOk = false; renderLayer(); break;
+    case 'closeAdminBg': if (ev.target === t) { S.admin = null; S.adminOk = false; renderLayer(); } break;
     case 'closePersonBg': if (ev.target === t) { S.person = null; renderLayer(); } break;
     case 'openClock': S.clock = true; renderLayer(); tickClocks(); break;
     case 'openTab': S.tab = true; renderLayer(); loadPdf(); break;
